@@ -1,1 +1,5 @@
-# this script will issue periodic redeploys and potentially issue alarms; pulls and pushes
+#!/bin/bash
+
+# This is run on the server
+env
+echo "Hello from the server!"

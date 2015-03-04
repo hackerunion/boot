@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Deploy the Hacker Union server to compatible cloud provider
+# Tested against AWS running Amazon Linux image
+
+if (( $# < 3 )); then
+  echo -e "Push complete server to a remote host.\n\nUsage: $0 ssh-url private-key secret-key\n"
+  exit 1
+fi
+
+URL=$1
+PEM=$2
+SECRET=$3
+REPO=${4:-`git config --get remote.origin.url`}
+
+if [ ! -f "$SECRET" ]; then
+  echo "Your secret key does not exist."
+  exit 2
+fi
+
+echo "Push new server to \"$URL\" based on \"$REPO\"?"
+read -p "(y/n) " RESP
+
+if echo $RESP | grep -qvi '^ye\?s\?$'; then
+  echo "Aborting!"
+  exit 4
+fi
+
+echo "Copying secret key..."
+scp -i "$PEM" "$SECRET" "$URL":/tmp/
+
+echo "Installing dependencies..."
+ssh -ti "$PEM" "$URL" sudo yum install -y git docker
+
+echo "Starting docker..."
+ssh -ti "$PEM" "$URL" sudo service docker restart
+
+echo "Cloning boot repository..."
+ssh -ti "$PEM" "$URL" git clone "$REPO" boot
+
+echo "Running deploy script..."
+ssh -ti "$PEM" "$URL" bash boot/deploy
+
+echo "Done!"
