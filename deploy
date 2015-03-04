@@ -1,5 +1,27 @@
 #!/bin/bash
 
-# This is run on the server
-env
-echo "Hello from the server!"
+# This is run on the server to deploy the dockerized kernel, to synchronize the repositories, and to reload on error
+REFRESH=${1:-yes}
+BOOT="$HOME/boot"
+ROOT="$HOME/root"
+
+sync_root() {
+  pushd "$ROOT"
+  
+  git add .
+  git commit -m "Checkpoint: `date`"
+  git pull --rebase
+  git push
+
+  popd
+}
+
+echo "Deploy script running on remote server."
+
+if [ ! -d "$ROOT" ]; then
+  git clone --recursive https://github.com/hackerunion/root.git root
+fi
+
+if echo $REFRESH | grep -iq 'yes'; then
+  
+fi
