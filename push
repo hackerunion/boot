@@ -13,9 +13,14 @@ PEM=$2
 SECRET=$3
 REPO=${4:-`git config --get remote.origin.url`}
 
+if [ ! -f "$PEM" ]; then
+  echo "Your private key does not exist."
+  exit 2
+fi
+
 if [ ! -f "$SECRET" ]; then
   echo "Your secret key does not exist."
-  exit 2
+  exit 3
 fi
 
 echo "Push new server to \"$URL\" based on \"$REPO\"?"
