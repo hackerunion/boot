@@ -18,10 +18,3 @@ sync_root() {
 
 echo "Deploy script running on remote server."
 
-if [ ! -d "$ROOT" ]; then
-  git clone --recursive https://github.com/hackerunion/root.git root
-fi
-
-if echo $REFRESH | grep -iq 'yes'; then
-  
-fi

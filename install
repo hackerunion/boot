@@ -8,42 +8,58 @@ if (( $# < 3 )); then
   exit 1
 fi
 
-URL=$1
-PEM=$2
-SECRET=$3
-REPO=$4
+HOST="$1"
+PUBKEY="$2"
+PRIKEY="$3"
+REPO="$4"
+DEST="${5:-/home/ec2-user}"
+CLEAN="$6"
 
-if [ ! -f "$PEM" ]; then
-  echo "Your private key does not exist."
+if [ ! -f "$PUBKEY" ]; then
+  echo $PUBKEY
+  echo "Your public key does not exist."
   exit 2
 fi
 
-if [ ! -f "$SECRET" ]; then
-  echo "Your secret key does not exist."
+if [ ! -f "$PRIKEY" ]; then
+  echo "Your private key does not exist."
   exit 3
 fi
 
-echo "Push new server to \"$URL\" based on \"$REPO\"?"
-read -p "(y/n) " RESP
+if echo "$CLEAN" | grep -qi '^ye\?s\?$'; then
+  CLEAN="[ -d \"$DEST/root\" ] && rm -rf \"$DEST/root\""
+fi
+
+echo -e "Push new server to \"$HOST\" based on \"$REPO\"?\n"
+[ -n "$CLEAN" ] && echo -e "WARNING: you've enabled \"clean\" mode which will erase existing data!\n"
+
+read -p "Continue? (y/n) " RESP
 
 if echo $RESP | grep -qvi '^ye\?s\?$'; then
   echo "Aborting!"
   exit 4
 fi
 
-echo "Copying secret key..."
-scp -i "$PEM" "$SECRET" "$URL":/tmp/
+echo "Copying keys..."
+scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$HOST":"$DEST"
 
 echo "Installing dependencies..."
-ssh -ti "$PEM" "$URL" sudo yum install -y git docker
+ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker
 
 echo "Starting docker..."
-ssh -ti "$PEM" "$URL" sudo service docker restart
+ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 
-echo "Cloning root repository..."
-ssh -ti "$PEM" "$URL" git clone --recursive "$REPO" root
-
-echo "Running deploy script..."
-ssh -ti "$PEM" "$URL" bash root/boot/deploy
+echo "Wiring everything up..."
+ssh -T -i "$PRIKEY" "$HOST" << EOF
+        [ -d "$DEST/.ssh" ] || mkdir "$DEST/.ssh"
+        mv "$DEST/`basename $PRIKEY`" "$DEST/`basename $PUBKEY`" "$DEST/.ssh"
+        echo github.com \
+          ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ== \
+            > "$DEST/.ssh/known_hosts"
+        chmod -R go-rwx "$DEST/.ssh"
+        $CLEAN
+        [ ! -d "$DEST/root" ] && git clone --recursive "$REPO" root
+        bash "$DEST/root/boot/deploy"
+EOF
 
 echo "Done!"
