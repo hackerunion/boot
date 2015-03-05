@@ -59,6 +59,11 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         chmod -R go-rwx "$DEST/.ssh"
         $CLEAN
         [ ! -d "$DEST/root" ] && git clone --recursive "$REPO" root
+        pushd "$DEST/root"
+        git config branch.master.sync true
+        git config branch.master.syncNewFiles true
+        popd
+        chmod u+x "$DEST/root/boot/lib/git-sync" "$DEST/root/boot/deploy"
         bash "$DEST/root/boot/deploy"
 EOF
 

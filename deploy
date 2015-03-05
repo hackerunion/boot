@@ -1,20 +1,22 @@
 #!/bin/bash
 
 # This is run on the server to deploy the dockerized kernel, to synchronize the repositories, and to reload on error
-REFRESH=${1:-yes}
-BOOT="$HOME/boot"
 ROOT="$HOME/root"
+SYNC="$ROOT/boot/lib/git-sync"
+
+if [ ! -x "$SYNC" ]; then
+  echo "Unable to find git-sync in boot repository. Exiting..."
+  exit 1
+fi
 
 sync_root() {
   pushd "$ROOT"
   
-  git add .
-  git commit -m "Checkpoint: `date`"
-  git pull --rebase
-  git push
+  $SYNC
 
   popd
 }
 
 echo "Deploy script running on remote server."
 
+sync_root
