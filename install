@@ -4,7 +4,7 @@
 # Tested against AWS running Amazon Linux image
 
 if (( $# < 3 )); then
-  echo -e "Push complete server to a remote host.\n\nUsage: $0 ssh-url private-key secret-key\n"
+  echo -e "Push complete server to a remote host.\n\nUsage: $0 url public-key private-key repo remote-path [clean: yes/no]\n"
   exit 1
 fi
 
