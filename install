@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deploy the Hacker Union server to compatible cloud provider
+# Install the Hacker Union server on a compatible cloud provider
 # Tested against AWS running Amazon Linux image
 
 if (( $# < 3 )); then
@@ -11,7 +11,7 @@ fi
 URL=$1
 PEM=$2
 SECRET=$3
-REPO=${4:-`git config --get remote.origin.url`}
+REPO=$4
 
 if [ ! -f "$PEM" ]; then
   echo "Your private key does not exist."
@@ -40,10 +40,10 @@ ssh -ti "$PEM" "$URL" sudo yum install -y git docker
 echo "Starting docker..."
 ssh -ti "$PEM" "$URL" sudo service docker restart
 
-echo "Cloning boot repository..."
-ssh -ti "$PEM" "$URL" git clone "$REPO" boot
+echo "Cloning root repository..."
+ssh -ti "$PEM" "$URL" git clone --recursive "$REPO" root
 
 echo "Running deploy script..."
-ssh -ti "$PEM" "$URL" bash boot/deploy
+ssh -ti "$PEM" "$URL" bash root/boot/deploy
 
 echo "Done!"
