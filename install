@@ -58,6 +58,8 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
             > "$DEST/.ssh/known_hosts"
         chmod -R go-rwx "$DEST/.ssh"
         $CLEAN
+        git config --global user.name "Hacker Union Bot"
+        git config --global user.email "root@hackerunion.org"
         [ ! -d "$DEST/root" ] && git clone --recursive "$REPO" root
         pushd "$DEST/root"
         git checkout master
