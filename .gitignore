@@ -1,6 +1,9 @@
 # Private files
 *.ignore
 
+# Build files
+build/*
+
 # Logs
 logs
 *.log

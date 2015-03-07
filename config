@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# This script must be run whenever dependencies change (for node or the server)
+
+ROOT=${ROOT:-"`dirname $0`/../"}
+PACKAGE=$ROOT/usr/src/kernel/package.json
+BUILD=${ROOT}/boot/build
+
+mkdir -p "$BUILD"
+
+if [ ! -f "$PACKAGE" ]; then
+  echo "Couldn't find npm requirements. Did you set ROOT correctly?"
+  exit 1
+fi
+
+cp "$PACKAGE" "./build/`basename $PACKAGE`"
