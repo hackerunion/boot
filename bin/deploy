@@ -4,7 +4,6 @@
 HOST_ROOT="$HOME/root"
 BOOT="$HOST_ROOT/boot"
 SRC="$HOST_ROOT/usr/src/kernel"
-
 SYNC="$BOOT/bin/opt/git-sync"
 
 if [ ! -x "$SYNC" ]; then
@@ -47,6 +46,12 @@ sync() {
   popd
 }
 
+mkimage() {
+  pushd $(BOOT)
+  yes n | ./configure
+  make docker-run
+}
+
 echo "Deploy script running on remote server."
 
 if sync; then
@@ -54,3 +59,5 @@ if sync; then
 else
   echo "Sync failed"
 fi
+
+mkimage
