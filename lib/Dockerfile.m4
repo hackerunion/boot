@@ -11,7 +11,8 @@ RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
 
 RUN cd /tmp && npm install -g
 
-ENV SERVER_ROOT=_SERVER_ROOT \
+ENV PATH=$PATH:_SERVER_ROOT`/bin' \
+    SERVER_ROOT=_SERVER_ROOT \
     SERVER_USERNAME=_SERVER_USERNAME \
     SERVER_UID=_SERVER_UID \
     SERVER_SECRET=_SERVER_SECRET \

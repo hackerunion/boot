@@ -3,9 +3,9 @@
 USERNAME="$1"
 USERID="$2"
 SECRET="$3"
-ROOT="$4"
+SERVER_ROOT="$4"
 
-PASSWD=`cat "$ROOT/etc/passwd.json"`
+PASSWD=`cat "$SERVER_ROOT/etc/passwd.json"`
 
 if (( $# < 4 )); then
   echo "$0: [username] [uid] [secret] [path-to-root]"
@@ -29,4 +29,4 @@ fi
 SHADOW=$(openssl passwd -1 "$SECRET" 2> /dev/null)
 JSON="{ \"username\": \"$USERNAME\", \"password\": \"$SHADOW\", \"uid\": \"$USERID\", \"gid\": \"$USERID\", \"info\": \"server user\", \"shell\": \"/dev/null\", \"service\": false, \"uri\": null }"
 
-echo -e "${PASSWD/[/[\n$JSON$TAIL}" > $ROOT/etc/passwd.json
+echo -e "${PASSWD/[/[\n$JSON$TAIL}" > $SERVER_ROOT/etc/passwd.json

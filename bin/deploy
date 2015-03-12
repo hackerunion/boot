@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # This is run on the server to deploy the dockerized kernel, to synchronize the repositories, and to reload on error
-ROOT="$HOME/root"
-BOOT="$HOME/root/boot"
-SRC="$HOME/root/usr/src/kernel"
+HOST_ROOT="$HOME/root"
+BOOT="$HOST_ROOT/boot"
+SRC="$HOST_ROOT/usr/src/kernel"
 
-SYNC="$ROOT/boot/bin/opt/git-sync"
+SYNC="$BOOT/bin/opt/git-sync"
 
 if [ ! -x "$SYNC" ]; then
   echo "Unable to find git-sync in boot repository. Exiting..."
@@ -35,7 +35,7 @@ sync() {
 
   popd
 
-  pushd $ROOT
+  pushd $HOST_ROOT
 
   if ! $SYNC; then
     echo "Sync failed for root, aborting."

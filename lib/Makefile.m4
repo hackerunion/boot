@@ -18,6 +18,8 @@ node: $(src)/package.json ; cp $(src)/package.json $(build)/package.json
 user: ; $(bin)/mkuser _SERVER_USERNAME _SERVER_UID _SERVER_SECRET _LOCAL_ROOT
 user-with-push: user ; { cd $(root); git add etc/passwd.json; git commit -m 'Added server credentials'; git push; }
 
+boot2docker: ; boot2docker up; $(shell boot2docker shellinit)
+
 docker-build: dockerfile node user; docker build --rm -t _DOCKER_IMAGE .
 docker-build-no-cache: dockerfile node user; docker build --no-cache=true --rm -t _DOCKER_IMAGE .
 
