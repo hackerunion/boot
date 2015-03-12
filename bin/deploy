@@ -46,10 +46,11 @@ sync() {
   popd
 }
 
-mkimage() {
-  pushd $(BOOT)
-  yes n | ./configure
-  make docker-run
+function start() {
+  pushd $BOOT
+  echo "Launching docker..."
+  make docker-run-no-build
+  popd
 }
 
 echo "Deploy script running on remote server."
@@ -60,4 +61,4 @@ else
   echo "Sync failed"
 fi
 
-mkimage
+
