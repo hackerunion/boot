@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd "$ROOT/usr/src/kernel/"
+npm run-script "${1:-boot}"

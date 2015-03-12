@@ -1,0 +1,17 @@
+#!/bin/bash
+
+read -p "Review and edit settings before continuing? (y/n) " RESP
+
+if echo "$RESP" | grep -qi '^ye\?s\?$'; then
+  "${VISUAL:-${EDITOR:-vi}}" ./lib/config.m4
+  
+  read -p "Apply configuration? (y/n) " RESP
+
+  ( echo "$RESP" | grep -qi '^ye\?s\?$' ) || exit 1
+fi
+
+echo "Generating Makefile from configuration..."
+
+m4 -I ./lib ./Makefile.m4 > Makefile
+
+echo "Done!"

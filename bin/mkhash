@@ -1,0 +1,19 @@
+#!/bin/bash
+
+PUBKEY="$1"
+PRIKEY="$2"
+
+if (( $# != 2 )); then
+  echo "$0: [path-to-public-key] [path-to-private-key]"
+  exit 1
+fi
+
+hash() {
+  if command -v sha512sum > /dev/null 2>&1; then
+    echo "$@" | sha512sum | cut -d' ' -f1
+  else
+    echo "$@" | shasum -a 512 | cut -d' ' -f1
+  fi
+}
+
+echo "$(hash `cat "$PRIKEY" | tr -d "[:space:]"`)"

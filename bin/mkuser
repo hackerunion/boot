@@ -1,0 +1,32 @@
+#!/bin/bash
+
+USERNAME="$1"
+USERID="$2"
+SECRET="$3"
+ROOT="$4"
+
+PASSWD=`cat "$ROOT/etc/passwd.json"`
+
+if (( $# < 4 )); then
+  echo "$0: [username] [uid] [secret] [path-to-root]"
+  exit 1
+fi
+
+if echo "$PASSWD" | grep -q "\"uid\"\s*:\s*\"$USERID\""; then
+  echo "User with UID $USERID already exists"
+  exit 0
+fi
+
+if echo "$PASSWD" | grep -q "\"username\"\s*:\s*\"$USERNAME\""; then
+  echo "User with username $USERNAME already exists"
+  exit 0
+fi
+
+if echo "$PASSWD" | grep -q '{'; then
+  TAIL=",$TAIL"
+fi
+
+SHADOW=$(openssl passwd -1 "$SECRET" 2> /dev/null)
+JSON="{ \"username\": \"$USERNAME\", \"password\": \"$SHADOW\", \"uid\": \"$USERID\", \"gid\": \"$USERID\", \"info\": \"server user\", \"shell\": \"/dev/null\", \"service\": false, \"uri\": null }"
+
+echo -e "${PASSWD/[/[\n$JSON$TAIL}" > $ROOT/etc/passwd.json

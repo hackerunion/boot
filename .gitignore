@@ -1,8 +1,11 @@
 # Private files
 *.ignore
+*.secret
 
 # Build files
 build/*
+Makefile
+Dockerfile
 
 # Logs
 logs

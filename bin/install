@@ -69,9 +69,8 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         git submodule foreach --recursive git config branch.master.sync true
         git submodule foreach --recursive git config branch.master.syncNewFiles true
         popd
-        cat "$DEST/.ssh/`basename $PRIKEY`" | sha512sum | cut -d' ' -f1 > "$DEST/root/etc/key.secret"
-        chmod u+x "$DEST/root/boot/lib/git-sync" "$DEST/root/boot/deploy"
-        bash "$DEST/root/boot/deploy"
+        chmod u+x "$DEST/root/boot/bin/opt/git-sync" "$DEST/root/boot/bin/deploy"
+        bash "$DEST/root/boot/bin/deploy"
 EOF
 
 echo "Done!"
