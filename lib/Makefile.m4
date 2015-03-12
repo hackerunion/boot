@@ -26,8 +26,8 @@ docker-build-no-cache: dockerfile node user; docker build --no-cache=true --rm -
 docker-run: docker-build docker-run-no-build ; 
 docker-run-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run --rm -ti -v _LOCAL_ROOT:_SERVER_ROOT -p _LOCAL_PORT:_SERVICE_PORT --name _DOCKER_CONTAINER _DOCKER_IMAGE bash
 
-install: docker-build; $(bin)/install _HOST_ADDR _PUBLIC_KEY _PRIVATE_KEY _HOST_REPOSITORY 
-install-clean: docker-build; $(bin)/install _HOST_ADDR _PUBLIC_KEY _PRIVATE_KEY _HOST_REPOSITORY yes
+install: ; $(bin)/install _HOST_ADDR _PUBLIC_KEY _PRIVATE_KEY _HOST_REPOSITORY _HOST_HOME
+install-clean: ; $(bin)/install _HOST_ADDR _PUBLIC_KEY _PRIVATE_KEY _HOST_REPOSITORY _HOST_HOME yes
 
 connect: ; ssh -i _PRIVATE_KEY _HOST_USER`@'_HOST_ADDR
 local: build; echo "TODO"
