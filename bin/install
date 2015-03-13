@@ -3,17 +3,19 @@
 # Install the Hacker Union server on a compatible cloud provider
 # Tested against AWS running Amazon Linux image
 
-if (( $# < 3 )); then
-  echo -e "Push complete server to a remote host.\n\nUsage: $0 url public-key private-key repo remote-path [clean: yes/no]\n"
+if (( $# < 7 )); then
+  echo -e "Push complete server to a remote host.\n\nUsage: $0 public-key private-key local-conf url repo remote-path [clean: yes/no]\n"
   exit 1
 fi
 
-HOST="$1"
-PUBKEY="$2"
-PRIKEY="$3"
-REPO="$4"
-DEST="${5:-/home/ec2-user}"
-CLEAN="$6"
+PUBKEY="$1"
+PRIKEY="$2"
+CONF="$3"
+HOST="$4"
+REPO="$5"
+DEST="${6:-/home/ec2-user}"
+ROOT="$7"
+CLEAN="$8"
 
 if [ ! -f "$PUBKEY" ]; then
   echo $PUBKEY
@@ -27,7 +29,7 @@ if [ ! -f "$PRIKEY" ]; then
 fi
 
 if echo "$CLEAN" | grep -qi '^ye\?s\?$'; then
-  CLEAN="[ -d \"$DEST/root\" ] && rm -rf \"$DEST/root\""
+  CLEAN="[ -d \"$ROOT\" ] && rm -rf \"$ROOT\""
 fi
 
 echo -e "Push new server to \"$HOST\" based on \"$REPO\"?\n"
@@ -40,8 +42,8 @@ if echo $RESP | grep -qvi '^ye\?s\?$'; then
   exit 4
 fi
 
-echo "Copying keys..."
-scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$HOST":"$DEST"
+echo "Copying keys and local configuration..."
+scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$CONF" "$HOST":"$DEST"
 
 echo "Installing dependencies..."
 ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker
@@ -52,16 +54,18 @@ ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 echo "Wiring everything up..."
 ssh -T -i "$PRIKEY" "$HOST" << EOF
         [ -d "$DEST/.ssh" ] || mkdir "$DEST/.ssh"
+        [ -d "$DEST/local" ] || mkdir "$DEST/local"
         mv "$DEST/`basename $PRIKEY`" "$DEST/`basename $PUBKEY`" "$DEST/.ssh"
+        mv "$DEST/`basename $CONF`" "$DEST/local/config.m4"
         echo github.com \
           ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ== \
             > "$DEST/.ssh/known_hosts"
-        chmod -R go-rwx "$DEST/.ssh"
+        chmod -R go-rwx "$DEST/.ssh" "$DEST/local"
         $CLEAN
-        git config --global user.name "Hacker Union Bot"
-        git config --global user.email "root@hackerunion.org"
-        [ ! -d "$DEST/root" ] && git clone --recursive "$REPO" root
-        pushd "$DEST/root"
+        git config --global user.name "root"
+        git config --global user.email "root@localhost"
+        [ ! -d "$ROOT" ] && git clone --recursive "$REPO" "$ROOT"
+        pushd "$ROOT"
         git checkout master
         git config branch.master.sync true
         git config branch.master.syncNewFiles true
@@ -69,12 +73,12 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         git submodule foreach --recursive git config branch.master.sync true
         git submodule foreach --recursive git config branch.master.syncNewFiles true
         popd
-        pushd "$DEST/root/boot"
+        pushd "$ROOT/boot"
         chmod -R u+x ./configure ./bin
-        yes n | ./configure
+        ./configure yes
         make docker-build
         popd
-        bash "$DEST/root/boot/bin/deploy"
+        bash "$ROOT/boot/bin/deploy" "$ROOT"
 EOF
 
 echo "Done!"

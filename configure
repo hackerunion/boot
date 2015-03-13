@@ -1,17 +1,25 @@
 #!/bin/bash
+set -x
+REMOTE="$1"
+OPTIONS=""
 
-read -p "Review and edit settings before continuing? (y/n) " RESP
+if [ -z "$REMOTE" ]; then
+  read -p "Review and edit settings before continuing? (y/n) " RESP
 
-if echo "$RESP" | grep -qi '^ye\?s\?$'; then
-  "${VISUAL:-${EDITOR:-vi}}" ./lib/config.m4
-  
-  read -p "Apply configuration? (y/n) " RESP
+  if echo "$RESP" | grep -qi '^ye\?s\?$'; then
+    "${VISUAL:-${EDITOR:-vi}}" ./lib/config.m4
+    
+    read -p "Apply configuration? (y/n) " RESP
 
-  ( echo "$RESP" | grep -qi '^ye\?s\?$' ) || exit 1
+    ( echo "$RESP" | grep -qi '^ye\?s\?$' ) || exit 1
+  fi
+else
+  echo "Running configuration on remote host..."
+  OPTIONS="-D _REMOTE"
 fi
 
 echo "Generating Makefile from configuration..."
 
-m4 -I ./lib ./Makefile.m4 > Makefile
+m4 $OPTIONS -I ./lib ./Makefile.m4 > Makefile
 
 echo "Done!"
