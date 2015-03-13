@@ -53,13 +53,11 @@ scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$CONF" "$HOST":"$DEST"
 echo "Installing dependencies..."
 ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4
 
-echo "Preparing docker..."
-ssh -ti "$PRIKEY" "$HOST" << EOF
-        sudo groupadd docker
-        sudo gpasswd -a \${USER} docker
-        sudo service docker restart
-        newgrp docker
-EOF
+echo "Preparing user for docker..."
+ssh -ti "$PRIKEY" "$HOST" sudo gpasswd -a \${USER} docker
+
+echo "Reloading docker..."
+ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 
 echo "Wiring everything up..."
 ssh -T -i "$PRIKEY" "$HOST" << EOF
@@ -72,6 +70,7 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
             > "$DEST/.ssh/known_hosts"
         chmod -R go-rwx "$DEST/.ssh" "$DEST/local"
         $CLEAN
+        newgrp docker
         git config --global user.name "root"
         git config --global user.email "root@localhost"
         [ ! -d "$ROOT" ] && git clone --recursive "$REPO" "$ROOT"
