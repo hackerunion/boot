@@ -13,7 +13,7 @@ PRIKEY="$2"
 CONF="$3"
 HOST="$4"
 REPO="$5"
-DEST="${6:-/home/ec2-user}"
+DEST="$6"
 ROOT="$7"
 CLEAN="$8"
 
@@ -26,6 +26,11 @@ fi
 if [ ! -f "$PRIKEY" ]; then
   echo "Your private key does not exist."
   exit 3
+fi
+
+if [ ! -f "$CONF" ]; then
+  echo "Your local configuration file does not exist."
+  exit 4
 fi
 
 if echo "$CLEAN" | grep -qi '^ye\?s\?$'; then
