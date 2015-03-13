@@ -1,4 +1,1 @@
-- need to copy secret config over with keys before install (otherwise make will not work)
-- need way to serve static files (if not executable, but readable, return raw contents)
 - copying as solution to volume issue may not be terrible - we can leave the one volume going in RO mode while we prep the next one?
-- need to correctly set root on host vs on local (local_root needs to point elsewhere...)

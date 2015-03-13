@@ -51,7 +51,7 @@ echo "Copying keys and local configuration..."
 scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$CONF" "$HOST":"$DEST"
 
 echo "Installing dependencies..."
-ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker
+ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4
 
 echo "Starting docker..."
 ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
