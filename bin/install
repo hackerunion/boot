@@ -54,7 +54,7 @@ echo "Installing dependencies..."
 ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4
 
 echo "Preparing docker..."
-ssh -T -i "$PRIKEY" "$HOST" << EOF
+ssh -ti "$PRIKEY" "$HOST" << EOF
         sudo groupadd docker
         sudo gpasswd -a \${USER} docker
         sudo service docker restart
