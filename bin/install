@@ -79,6 +79,7 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         git submodule foreach --recursive git config branch.master.syncNewFiles true
         popd
         pushd "$ROOT/boot"
+        mkdir build
         chmod -R u+x ./configure ./bin
         ./configure yes
         make docker-build

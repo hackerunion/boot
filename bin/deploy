@@ -6,6 +6,8 @@ BOOT="$ROOT/boot"
 SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
+echo "ROOT", "$ROOT"
+
 if [ ! -x "$SYNC" ]; then
   echo "Unable to find git-sync in boot repository. Exiting..."
   exit 1
@@ -23,7 +25,7 @@ sync() {
 
   popd
 
-  pushd $SRC
+  pushd "$SRC"
 
   if ! $SYNC; then
     echo "Sync failed for kernel, aborting."
@@ -34,7 +36,7 @@ sync() {
 
   popd
 
-  pushd $ROOT
+  pushd "$ROOT"
 
   if ! $SYNC; then
     echo "Sync failed for root, aborting."
@@ -49,7 +51,7 @@ sync() {
 function start() {
   pushd $BOOT
   echo "Launching docker..."
-  make docker-run-no-build
+  #make docker-run-no-build
   popd
 }
 
