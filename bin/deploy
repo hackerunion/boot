@@ -6,8 +6,6 @@ BOOT="$ROOT/boot"
 SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
-echo "ROOT", "$ROOT"
-
 if [ ! -x "$SYNC" ]; then
   echo "Unable to find git-sync in boot repository. Exiting..."
   exit 1
@@ -35,7 +33,8 @@ sync() {
   git checkout master
 
   popd
-
+  echo "ABORTING--------------------------$ROOT"
+  exit 0
   pushd "$ROOT"
 
   if ! $SYNC; then

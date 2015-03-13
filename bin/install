@@ -53,8 +53,13 @@ scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$CONF" "$HOST":"$DEST"
 echo "Installing dependencies..."
 ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4
 
-echo "Starting docker..."
-ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
+echo "Preparing docker..."
+ssh -T -i "$PRIKEY" "$HOST" << EOF
+        sudo groupadd docker
+        sudo gpasswd -a \${USER} docker
+        sudo service docker restart
+        newgrp docker
+EOF
 
 echo "Wiring everything up..."
 ssh -T -i "$PRIKEY" "$HOST" << EOF
