@@ -2,3 +2,4 @@
 - need to ensure private files are private (o-rwx...) (i.e., tokens / perms / etc)
 - need to not share secret in env
 - live terminal
+- passwd.json not readable?
