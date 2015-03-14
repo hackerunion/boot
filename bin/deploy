@@ -8,7 +8,7 @@ SYNC="$BOOT/bin/opt/git-sync"
 
 POLL=180
 CYCLES=30
-CURRENT=0
+CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
 if [ ! -x "$SYNC" ]; then
   echo "Unable to find git-sync in boot repository. Exiting..."
@@ -62,15 +62,15 @@ function try_sync() {
 
 function sync_needed() {
   RESULT=1
-  echo 1
+
   pushd "$ROOT"
   git fetch origin
-  echo 2
+  
   if [ -n "$(git log HEAD..origin/master --oneline)" ]; then
     RESULT=0
   fi
   popd
-  echo 3
+
   return $RESULT
 }
 
@@ -91,19 +91,19 @@ function halt() {
 function poll_state() {
   pushd $BOOT
   
-  if (( $CURRENT > $CYCLES )); then
-    CURRENT=0
+  if (( `cat $CURRENT` > $CYCLES )); then
+    echo 0 > "$CURRENT"
     echo "refresh"
-  elif sync_needed >> /tmp/junk1 2>&1; then
+  elif sync_needed > /dev/null 2>&1; then
     echo "resync"
-  elif make kernel-running >> /tmp/junk2 2>&1; then
+  elif make kernel-running > /dev/null 2>&1; then
     echo "running"
   else
     echo "crash"
   fi
   popd
-
-  CURRENT=$((CURRENT + 1))
+  
+  echo "$(( `cat $CURRENT` + 1 ))" > "$CURRENT"
 }
 
 function main() {
@@ -111,7 +111,6 @@ function main() {
 
   # less attractive than a webhook, but decouples kernel from github
   while true; do
-    echo yay
     case "$STATE" in
       startup|crash)
         echo "Entering $STATE..."
@@ -129,7 +128,7 @@ function main() {
         ;;
 
       *)
-        echo "Mark: `date` ($CURRENT / $CYCLES) [${POLL}s]"
+        echo "Mark: `date` (`cat $CURRENT` / $CYCLES) [${POLL}s]"
         sleep $POLL;
     esac
 
