@@ -28,7 +28,7 @@ shutdown_server() {
 start_ssh() {
   echo "Launching SSH server on port $SSH..."
   mkdir /var/run/sshd > /dev/null 2>&1
-  /usr/sbin/sshd -p "$SSH" -o PermitRootLogin=yes -o PasswordAuthentication=yes -D
+  /usr/sbin/sshd -p "$SSH" -o PermitRootLogin=yes -o PasswordAuthentication=yes
 }
 
 trap shutdown_server SIGTERM
