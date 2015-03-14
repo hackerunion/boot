@@ -6,6 +6,10 @@ BOOT="$ROOT/boot"
 SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
+POLL=120
+CYCLES=30
+CURRENT=0
+
 if [ ! -x "$SYNC" ]; then
   echo "Unable to find git-sync in boot repository. Exiting..."
   exit 1
@@ -46,20 +50,90 @@ sync() {
   popd
 }
 
-function start() {
+function try_sync() {
+  if sync; then
+    echo "Sync was successful"
+    return 0
+  else
+    echo "Sync failed"
+    return 1
+  fi
+}
+
+function sync_needed() {
+  RESULT=1
+
+  pushd "$ROOT"
+  git fetch origin
+  
+  if [ -n "$(git log HEAD..origin/master --oneline)" ]; then
+    RESULT=0
+  fi
+  popd
+
+  return $RESULT
+}
+
+function boot() {
   pushd $BOOT
-  echo "Launching docker..."
-  make docker-run-no-build
+  echo "Launching kernel in docker..."
+  make kernel-boot-no-build
   popd
 }
 
+function halt() {
+  pushd $BOOT
+  echo "Stopping kernel in docker..."
+  make kernel-halt-and-block
+  popd
+}
+
+function poll_state() {
+  pushd $BOOT
+  
+  if (( $CURRENT > $CYCLES )); then
+    CURRENT=0
+    echo "refresh"
+  elif sync_needed > /dev/null 2>&1; then
+    echo "resync"
+  elif make kernel-running > /dev/null 2>&1; then
+    echo "running"
+  else
+    echo "crash"
+  fi
+  popd
+
+  CURRENT=$((CURRENT + 1))
+}
+
+function main() {
+  STATE='startup'
+
+  # less attractive than a webhook, but decouples kernel from github
+  while true; do
+    case "$STATE" in
+      startup|crash)
+        echo "Entering $STATE..."
+        try_sync
+        boot
+        echo "Done!"
+        ;;
+
+      refresh|resync)
+        echo "Entering $STATE..."
+        halt
+        try_sync
+        boot
+        echo "Done!"
+        ;;
+
+      *)
+        sleep $POLL;
+    esac
+
+    STATE=`poll_state`
+  done
+}
+
 echo "Deploy script running on remote server."
-
-if sync; then
-  echo "Sync was successful"
-  #start
-else
-  echo "Sync failed"
-fi
-
-
+main

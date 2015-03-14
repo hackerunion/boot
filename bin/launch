@@ -1,4 +1,36 @@
 #!/bin/bash
 
+PID=""
+MAX=30
+
+shutdown_server() {
+  if [ -n "$PID" ]; then
+    echo "Signalling server..."
+    kill -SIGTERM "$PID"
+
+    for ((i=0; i<$MAX; i++)); do
+      if ! ps "$PID"; then
+        echo " Done!"
+        exit 0
+      fi
+
+      echo -n "."
+      sleep 1
+    done
+  fi
+
+  echo "Shutdown failed!"
+  exit 1
+}
+
+trap shutdown_server SIGTERM
+
+echo "Launching..."
 cd "$SERVER_ROOT/usr/src/kernel/"
-npm run-script "${1:-boot}"
+
+# can't run using npm since npm dies on signal
+DEBUG="$1" node ./bin/boot.js &
+PID="$!"
+
+echo "Waiting for worker..."
+wait "$PID"

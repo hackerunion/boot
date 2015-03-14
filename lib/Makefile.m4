@@ -27,6 +27,14 @@ docker-build-no-cache: dockerfile node user; docker build --no-cache=true --rm -
 docker-run: docker-build docker-run-no-build ; 
 docker-run-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run --rm -ti -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT --name _DOCKER_CONTAINER _DOCKER_IMAGE bash
 
+kernel-boot: docker-build kernel-boot-no-build ; 
+kernel-boot-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run -d -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT --name _DOCKER_CONTAINER _DOCKER_IMAGE ./boot/bin/launch/kernel
+
+kernel-halt: ; docker kill --signal=TERM _DOCKER_CONTAINER
+kernel-halt-and-block: kernel-halt ; { while true; do sleep 1; docker inspect --format="{{ .State.Running }}" _DOCKER_CONTAINER | grep -qi false && exit 1; done }
+
+kernel-running: ; docker inspect --format="{{ .State.Running }}" | grep -qi 'true'
+
 install: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_CONFIG _HOST_USER`@'_HOST_ADDR _HOST_REPOSITORY _HOST_HOME _HOST_ROOT
 install-clean: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_CONFIG _HOST_USER`@'_HOST_ADDR _HOST_REPOSITORY _HOST_HOME _HOST_ROOT yes
 
