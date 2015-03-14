@@ -39,5 +39,5 @@ install: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_CONFIG _HO
 install-clean: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_CONFIG _HOST_USER`@'_HOST_ADDR _HOST_REPOSITORY _HOST_HOME _HOST_ROOT yes
 
 connect: ; ssh -i _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR
-local: build; echo "TODO"
-clean: ; rm $(build)/*
+local: ; echo "TODO"
+clean: ; rm $(build)/* 

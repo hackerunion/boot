@@ -1,6 +1,7 @@
 define(`_LOCAL_ROOT', `/Users/brandon/kernel')
 define(`_LOCAL_PORT', `8888')
 define(`_LOCAL_CONFIG', _LOCAL_ROOT`/boot/lib/config.m4.secret')
+define(`_LOCAL_DEVELOPER_CONFIG', _LOCAL_ROOT`/boot/lib/developer.m4.ignore')
 
 define(`_HOST_HOME', `/home/ec2-user')
 define(`_HOST_ROOT', _HOST_HOME`/root')
@@ -22,6 +23,7 @@ define(`_SERVER_USERNAME', `server')
 define(`_SERVER_UID', `1337')
 define(`_SERVER_URI', `http://localhost:'_SERVER_PORT)
 
-define(`_SSH_PORT', 25)
+define(`_SSH_PORT', `1337')
 
 sinclude(_LOCAL_CONFIG)
+sinclude(_LOCAL_DEVELOPER_CONFIG)
