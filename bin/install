@@ -33,8 +33,8 @@ if [ ! -f "$CONF" ]; then
   exit 4
 fi
 
-if echo "$CLEAN" | grep -qi '^ye\?s\?$'; then
-  CLEAN="[ -d \"$ROOT\" ] && rm -rf \"$ROOT\""
+if echo "$CLEAN" | grep -qiv '^ye\?s\?$'; then
+  CLEAN=""
 fi
 
 echo -e "Push new server to \"$HOST\" based on \"$REPO\"?\n"
@@ -53,6 +53,11 @@ scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$CONF" "$HOST":"$DEST"
 echo "Installing dependencies..."
 ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4
 
+if [ -n "$CLEAN" ]; then
+  echo "Cleaning up old repository..."
+  ssh -ti "$PRIKEY" "$HOST" sudo rm -rf "$ROOT"
+fi
+
 echo "Preparing user for docker..."
 ssh -ti "$PRIKEY" "$HOST" sudo gpasswd -a \${USER} docker
 
@@ -69,7 +74,6 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
           ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ== \
             > "$DEST/.ssh/known_hosts"
         chmod -R go-rwx "$DEST/.ssh" "$DEST/local"
-        $CLEAN
         newgrp docker
         git config --global user.name "root"
         git config --global user.email "root@localhost"
