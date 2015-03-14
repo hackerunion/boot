@@ -15,7 +15,8 @@ ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_UID=_SERVER_UID \
     SERVER_URI=_SERVER_URI \
     SERVER_SECRET=_SERVER_SECRET \
-    COOKIE_SECRET=_COOKIE_SECRET 
+    COOKIE_SECRET=_COOKIE_SECRET \
+    NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules
 
 ADD ./build/package.json /tmp/package.json
 RUN cd /tmp && npm install -g
