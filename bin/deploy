@@ -57,7 +57,7 @@ echo "Deploy script running on remote server."
 
 if sync; then
   echo "Sync was successful"
-  start
+  #start
 else
   echo "Sync failed"
 fi
