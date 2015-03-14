@@ -66,6 +66,7 @@ ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 
 echo "Wiring everything up..."
 ssh -T -i "$PRIKEY" "$HOST" << EOF
+        pushd "$DEST"
         [ -d "$DEST/.ssh" ] || mkdir "$DEST/.ssh"
         [ -d "$DEST/local" ] || mkdir "$DEST/local"
         mv "$DEST/`basename $PRIKEY`" "$DEST/`basename $PUBKEY`" "$DEST/.ssh"
@@ -77,7 +78,7 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         newgrp docker
         git config --global user.name "root"
         git config --global user.email "root@localhost"
-        rmdir "$ROOT" 2> /dev/null && git clone --recursive "$REPO" "$ROOT"
+        (  [ ! -d "$ROOT" ] || rmdir "$ROOT" 2> /dev/null ) && git clone --progress --recursive "$REPO" "$ROOT"
         pushd "$ROOT"
         git checkout master
         git config branch.master.sync true
@@ -91,6 +92,7 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         chmod -R u+x ./configure ./bin
         ./configure yes
         make docker-build
+        popd
         popd
         bash "$ROOT/boot/bin/deploy" "$ROOT"
 EOF
