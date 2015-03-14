@@ -1,6 +1,8 @@
 #!/bin/bash
 
 PID=""
+DEBUG="$1"
+SSH="$2"
 MAX=30
 
 shutdown_server() {
@@ -23,13 +25,23 @@ shutdown_server() {
   exit 1
 }
 
+start_ssh() {
+  echo "Launching SSH server on port $SSH..."
+  mkdir /var/run/sshd > /dev/null 2>&1
+  /usr/sbin/sshd -p "$SSH" -o PermitRootLogin=yes -o PasswordAuthentication=yes -D
+}
+
 trap shutdown_server SIGTERM
 
-echo "Launching..."
+if [ -n "$SSH" ]; then
+  start_ssh
+fi
+
+echo "Launching kernel..."
 cd "$SERVER_ROOT/usr/src/kernel/"
 
 # can't run using npm since npm dies on signal
-DEBUG="$1" node ./bin/boot.js &
+DEBUG="$DEBUG" node ./bin/boot.js &
 PID="$!"
 
 echo "Waiting for worker..."

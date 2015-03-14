@@ -22,4 +22,6 @@ define(`_SERVER_USERNAME', `server')
 define(`_SERVER_UID', `1337')
 define(`_SERVER_URI', `http://localhost:'_SERVER_PORT)
 
+define(`_SSH_PORT', 25)
+
 sinclude(_LOCAL_CONFIG)
