@@ -4,7 +4,9 @@ include(`common.m4')
 FROM node:0.12
 USER root
 
-RUN cd /tmp && npm install -g
+# TODO: figure out how to properly avoid release file expiration (based on old image?)
+RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
+    cron
 
 ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_ROOT=_SERVER_ROOT \
@@ -15,13 +17,10 @@ ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_SECRET=_SERVER_SECRET \
     COOKIE_SECRET=_COOKIE_SECRET 
 
+ADD ./build/package.json /tmp/package.json
+RUN cd /tmp && npm install -g
+
 VOLUME _SERVER_ROOT
 WORKDIR _SERVER_ROOT
-
-ADD ./build/package.json /tmp/package.json
-
-# TODO: figure out how to properly avoid release file expiration (based on old image?)
-RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
-    cron
 
 EXPOSE _SERVER_PORT
