@@ -116,7 +116,7 @@ function main() {
         echo "Entering $STATE..."
         try_sync
         boot
-        echo "Done!"
+        echo "Done! ($STATE)"
         ;;
 
       refresh|resync)
@@ -124,7 +124,7 @@ function main() {
         halt
         try_sync
         boot
-        echo "Done!"
+        echo "Done! ($STATE)"
         ;;
 
       *)
