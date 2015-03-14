@@ -6,8 +6,8 @@ BOOT="$ROOT/boot"
 SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
-POLL=180
-CYCLES=30
+POLL=10
+CYCLES=60
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
 if [ ! -x "$SYNC" ]; then
