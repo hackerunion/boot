@@ -33,8 +33,7 @@ sync() {
   git checkout master
 
   popd
-  echo "ABORTING--------------------------$ROOT"
-  exit 0
+  
   pushd "$ROOT"
 
   if ! $SYNC; then
@@ -50,7 +49,7 @@ sync() {
 function start() {
   pushd $BOOT
   echo "Launching docker..."
-  #make docker-run-no-build
+  make docker-run-no-build
   popd
 }
 
@@ -58,6 +57,7 @@ echo "Deploy script running on remote server."
 
 if sync; then
   echo "Sync was successful"
+  start
 else
   echo "Sync failed"
 fi
