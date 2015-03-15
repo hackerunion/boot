@@ -11,7 +11,7 @@ shutdown_server() {
     kill -SIGTERM "$PID"
 
     for ((i=0; i<$MAX; i++)); do
-      if ! ps "$PID"; then
+      if ! ps "$PID" > /dev/null 2>&1; then
         echo " Done!"
         exit 0
       fi
