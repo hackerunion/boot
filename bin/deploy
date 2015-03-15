@@ -89,9 +89,13 @@ function halt() {
 }
 
 function wait_for_boot() {
+  pushd $BOOT
   while ! make kernel-running > /dev/null 2>&1; do
+    echo -n "."
     sleep 1
   done
+  echo " Done!"
+  popd
 }
 
 function poll_state() {
