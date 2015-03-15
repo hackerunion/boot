@@ -7,7 +7,7 @@ MAX=30
 
 shutdown_server() {
   if [ -n "$PID" ]; then
-    echo "Signalling server..."
+    echo "Sending signal to server..."
     kill -SIGTERM "$PID"
 
     for ((i=0; i<$MAX; i++)); do

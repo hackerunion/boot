@@ -93,7 +93,7 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         ./configure yes
         make docker-build
         popd
-        bash "$ROOT/boot/bin/deploy" "$ROOT"
+        bash "$ROOT/boot/bin/agent" "$ROOT"
 EOF
 
 echo "Done!"

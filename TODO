@@ -7,3 +7,6 @@
 
 - cgi/bin
 
+- why is halt and block not actually blocking?
+
+- why does mark go back to 2?
