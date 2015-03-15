@@ -6,7 +6,7 @@ BOOT="$ROOT/boot"
 SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
-POLL=3
+POLL=1
 CYCLES=5
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
@@ -91,10 +91,8 @@ function halt() {
 function wait_for_boot() {
   pushd $BOOT
   while ! make kernel-running > /dev/null 2>&1; do
-    echo -n "."
     sleep 1
   done
-  echo " Done!"
   popd
 }
 
@@ -140,11 +138,11 @@ function main() {
         ;;
 
       *)
-        echo "Mark: `date` (`cat $CURRENT` / $CYCLES) [${POLL}s]"
+        echo "Mark ($STATE): `date` (`cat $CURRENT` / $CYCLES) [${POLL}s]"
         sleep $POLL;
     esac
-
-    STATE=$(poll_state)
+    
+    STATE="$(poll_state)"
   done
 }
 
