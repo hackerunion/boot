@@ -6,8 +6,8 @@ BOOT="$ROOT/boot"
 SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
-POLL=10
-CYCLES=6
+POLL=1
+CYCLES=5
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
 if [ ! -x "$SYNC" ]; then
@@ -91,7 +91,7 @@ function halt() {
 function poll_state() {
   pushd $BOOT
   
-  if (( `cat $CURRENT` > $CYCLES )); then
+  if (( `cat $CURRENT` >= $CYCLES )); then
     echo 0 > "$CURRENT"
     echo "refresh"
   elif sync_needed > /dev/null 2>&1; then
@@ -131,8 +131,10 @@ function main() {
         echo "Mark: `date` (`cat $CURRENT` / $CYCLES) [${POLL}s]"
         sleep $POLL;
     esac
-
+    echo "OLD: $STATE"
     STATE=`poll_state`
+    echo "NEW: $STATE"
+
   done
 }
 
