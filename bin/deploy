@@ -6,7 +6,7 @@ BOOT="$ROOT/boot"
 SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
-POLL=1
+POLL=60
 CYCLES=5
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
