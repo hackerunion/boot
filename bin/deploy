@@ -16,7 +16,7 @@ if [ ! -x "$SYNC" ]; then
 fi
 
 sync() {
-  pushd "$BOOT"
+  pushd "$BOOT" > /dev/null
 
   if ! $SYNC; then
     echo "Sync failed for boot, aborting."
@@ -25,9 +25,9 @@ sync() {
 
   git checkout master
 
-  popd
+  popd > /dev/null
 
-  pushd "$SRC"
+  pushd "$SRC" > /dev/null
 
   if ! $SYNC; then
     echo "Sync failed for kernel, aborting."
@@ -36,9 +36,9 @@ sync() {
 
   git checkout master
 
-  popd
+  popd > /dev/null
   
-  pushd "$ROOT"
+  pushd "$ROOT" > /dev/null
 
   if ! $SYNC; then
     echo "Sync failed for root, aborting."
@@ -47,7 +47,7 @@ sync() {
 
   git checkout master
 
-  popd
+  popd > /dev/null
 }
 
 function try_sync() {
@@ -63,41 +63,41 @@ function try_sync() {
 function sync_needed() {
   RESULT=1
 
-  pushd "$ROOT"
+  pushd "$ROOT" > /dev/null
   git fetch origin
   
   if [ -n "$(git log HEAD..origin/master --oneline)" ]; then
     RESULT=0
   fi
-  popd
+  popd > /dev/null
 
   return $RESULT
 }
 
 function boot() {
-  pushd $BOOT
+  pushd $BOOT > /dev/null
   echo "Launching kernel in docker..."
   make kernel-boot-no-build
-  popd
+  popd > /dev/null
 }
 
 function halt() {
-  pushd $BOOT
+  pushd $BOOT > /dev/null
   echo "Stopping kernel in docker..."
   make kernel-halt-and-block
-  popd
+  popd > /dev/null
 }
 
 function wait_for_boot() {
-  pushd $BOOT
+  pushd $BOOT > /dev/null
   while ! make kernel-running > /dev/null 2>&1; do
     sleep 1
   done
-  popd
+  popd > /dev/null
 }
 
 function poll_state() {
-  pushd $BOOT
+  pushd $BOOT > /dev/null
   
   if (( `cat $CURRENT` >= $CYCLES )); then
     echo 0 > "$CURRENT"
@@ -109,7 +109,7 @@ function poll_state() {
   else
     echo "crash"
   fi
-  popd
+  popd > /dev/null
   
   echo "$(( `cat $CURRENT` + 1 ))" > "$CURRENT"
 }
