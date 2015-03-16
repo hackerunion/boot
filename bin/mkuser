@@ -27,6 +27,6 @@ if echo "$PASSWD" | grep -q '{'; then
 fi
 
 SHADOW=$(openssl passwd -1 "$SECRET" 2> /dev/null)
-JSON="{ \"username\": \"$USERNAME\", \"password\": \"$SHADOW\", \"uid\": \"$USERID\", \"gid\": \"$USERID\", \"info\": \"server user\", \"shell\": \"/dev/null\", \"service\": false, \"uri\": null }"
+JSON="{ \"username\": \"$USERNAME\", \"password\": \"$SHADOW\", \"uid\": \"$USERID\", \"gid\": \"$USERID\", \"info\": \"managed user\", \"shell\": \"/sbin/nologin\", \"service\": false, \"uri\": null }"
 
 echo -e "${PASSWD/[/[\n$JSON$TAIL}" > $SERVER_ROOT/etc/passwd.json
