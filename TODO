@@ -2,6 +2,5 @@
 
 - investigate js from old hu project
 
-- logging out is STILL dumb
-- solve anonymous user problem
-- if no user or auth, attempt to login using default account...
+- how do we load dependencies for nested apps?
+- how do we handle nested submodules? (maybe updating a submodule requires a pull request - that kinda makes sense; can also add autosync modules... maybe a config file?)
