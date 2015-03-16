@@ -27,6 +27,9 @@ docker-build-no-cache: dockerfile node user; docker build --no-cache=true --rm -
 docker-run: docker-build docker-run-no-build ; 
 docker-run-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run --rm -ti -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT ifelse(_SSH_PORT, `', `', `-p '_SSH_PORT`:'_SSH_PORT) --name _DOCKER_CONTAINER _DOCKER_IMAGE bash
 
+kernel-development: docker-build kernel-development-no-build ; 
+kernel-development-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run -d -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT ifelse(_SSH_PORT, `', `', `-p '_SSH_PORT`:'_SSH_PORT) --name _DOCKER_CONTAINER _DOCKER_IMAGE ./boot/bin/development kernel
+
 kernel-boot: docker-build kernel-boot-no-build ; 
 kernel-boot-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run -d -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT ifelse(_SSH_PORT, `', `', `-p '_SSH_PORT`:'_SSH_PORT) --name _DOCKER_CONTAINER _DOCKER_IMAGE ./boot/bin/launch kernel _SSH_PORT
 
