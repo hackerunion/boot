@@ -146,5 +146,5 @@ function main() {
   done
 }
 
-echo "Deploy script running on remote server."
+echo "Supervising agent running on remote server."
 main

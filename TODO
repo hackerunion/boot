@@ -1,12 +1,7 @@
+- need to ensure perms are started right - currently set to some weird stuff
 
-- need to ensure private files are private (o-rwx...) (i.e., tokens / perms / etc)
-- need to not share secret in env
-- passwd.json not readable?
+- investigate js from old hu project
 
-- set shell to real shell. use the user's home directory to customize their experience on web
-
-- cgi/bin
-
-- why is halt and block not actually blocking?
-
-- why does mark go back to 2?
+- logging out is STILL dumb
+- solve anonymous user problem
+- if no user or auth, attempt to login using default account...

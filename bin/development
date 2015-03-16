@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DEBUG="$1"
+
+echo "Launching kernel in development mode..."
+
+if ! command -v nodemon > /dev/null 2>&1; then
+  echo "Installing nodemon (for autoload)..."
+  npm install -g nodemon
+  echo "Installed!"
+fi
+
+cd "$SERVER_ROOT/usr/src/kernel/"
+DEBUG=$DEBUG SERVER_NO_INIT=true nodemon ./bin/boot.js
