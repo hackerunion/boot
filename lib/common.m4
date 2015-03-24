@@ -1,6 +1,7 @@
-ifdef(`_REMOTE', sinclude(_HOST_HOME/local/config.m4))
+ifdef(`_REMOTE', sinclude(_HOST_CONFIG))
 
 define(`_THIS_ROOT', ifdef(`_REMOTE', _HOST_ROOT, _LOCAL_ROOT))
 define(`_THIS_PORT', ifdef(`_REMOTE', _HOST_PORT, _LOCAL_PORT))
-define(`_NEXT_ROOT', ifdef(`_REMOTE', _SERVER_ROOT, _HOST_ROOT))
-define(`_NEXT_PORT', ifdef(`_REMOTE', _SERVER_PORT, _HOST_PORT))
+define(`_THIS_SECURE_KEY', ifdef(`_REMOTE', _HOST_SECURE_KEY, _LOCAL_SECURE_KEY))
+define(`_THIS_SECURE_CERT', ifdef(`_REMOTE', _HOST_SECURE_CERT, _LOCAL_SECURE_CERT))
+define(`_THIS_SECURE_PORT', ifdef(`_REMOTE', _HOST_SECURE_PORT, _LOCAL_SECURE_PORT))

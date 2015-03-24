@@ -4,18 +4,23 @@
 # Tested against AWS running Amazon Linux image
 
 if (( $# < 7 )); then
-  echo -e "Push complete server to a remote host.\n\nUsage: $0 public-key private-key local-conf url repo remote-path [clean: yes/no]\n"
+  echo -e "Push complete server to a remote host.\n\nUsage: $0 public-key private-key secure-key secure-cert local-conf url repo remote-path [clean: yes/no]\n"
   exit 1
 fi
 
 PUBKEY="$1"
 PRIKEY="$2"
-CONF="$3"
-HOST="$4"
-REPO="$5"
-DEST="$6"
-ROOT="$7"
-CLEAN="$8"
+SSLKEY="$3"
+SSLCERT="$4"
+CONF="$5"
+HOST="$6"
+REPO="$7"
+DEST="$8"
+DESTKEY="$9"
+DESTCERT="${10}"
+DESTCONF="${11}"
+ROOT="${12}"
+CLEAN="${13}"
 
 if [ ! -f "$PUBKEY" ]; then
   echo $PUBKEY
@@ -28,9 +33,20 @@ if [ ! -f "$PRIKEY" ]; then
   exit 3
 fi
 
+if [ ! -f "$SSLKEY" ]; then
+  echo $PUBKEY
+  echo "Your secure server key does not exist."
+  exit 4
+fi
+
+if [ ! -f "$SSLCERT" ]; then
+  echo "Your secure server certificate does not exist."
+  exit 5
+fi
+
 if [ ! -f "$CONF" ]; then
   echo "Your local configuration file does not exist."
-  exit 4
+  exit 6
 fi
 
 if echo "$CLEAN" | grep -qiv '^ye\?s\?$'; then
@@ -44,14 +60,14 @@ read -p "Continue? (y/n) " RESP
 
 if echo $RESP | grep -qvi '^ye\?s\?$'; then
   echo "Aborting!"
-  exit 4
+  exit 7
 fi
 
 echo "Copying keys and local configuration..."
-scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$CONF" "$HOST":"$DEST"
+scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$SSLKEY" "$SSLCERT" "$CONF" "$HOST":"$DEST"
 
 echo "Installing dependencies..."
-ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4
+ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4 shellinabox
 
 if [ -n "$CLEAN" ]; then
   echo "Cleaning up old repository..."
@@ -70,7 +86,9 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         [ -d "$DEST/.ssh" ] || mkdir "$DEST/.ssh"
         [ -d "$DEST/local" ] || mkdir "$DEST/local"
         mv "$DEST/`basename $PRIKEY`" "$DEST/`basename $PUBKEY`" "$DEST/.ssh"
-        mv "$DEST/`basename $CONF`" "$DEST/local/config.m4"
+        mv "$DEST/`basename $SSLKEY`" "$DESTKEY"
+        mv "$DEST/`basename $SSLCERT`" "$DESTCERT"
+        mv "$DEST/`basename $CONF`" "$DESTCONF"
         echo github.com \
           ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ== \
             > "$DEST/.ssh/known_hosts"

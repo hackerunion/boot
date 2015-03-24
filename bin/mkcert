@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Dervied from: http://blog.matoski.com/articles/node-express-generate-ssl/
+
+if (( $# < 2 )); then
+  echo "$0: [key-path] [cert-path]"
+  exit 1
+fi
+
+KEY="$1"
+CERT="$2"
+
+rm $KEY $CERT
+
+openssl req -nodes -new -x509 -newkey rsa:2048 -keyout $KEY -out $CERT -days 365
