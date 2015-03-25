@@ -81,6 +81,9 @@ echo "Reloading docker..."
 ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 
 echo "Wiring everything up..."
+
+AGENT="$ROOT/boot/bin/babysit $DEST/local/agent.pid $ROOT/boot/bin/agent $ROOT"
+
 ssh -T -i "$PRIKEY" "$HOST" << EOF
         pushd "$DEST"
         [ -d "$DEST/.ssh" ] || mkdir "$DEST/.ssh"
@@ -108,7 +111,8 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         ./configure yes
         make docker-build
         popd
-        bash "$ROOT/boot/bin/agent" "$ROOT"
+        echo "* * * * * $AGENT" | crontab
+        bash $AGENT
 EOF
 
 echo "Done!"

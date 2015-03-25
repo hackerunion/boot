@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if (( $# < 2 )); then
+  echo "$0: [pid-file] [bin] ...[args]"
+  exit 1
+fi
+
+PIDFILE="$1"
+BIN="$2"
+
+shift 2
+
+if [ ! -r "$PIDFILE" ] || ! pgrep -F "$PIDFILE" > /dev/null 2>&1; then
+    nohup "$BIN" "$@" > /tmp/$$.out 2> /tmp/$$.err &
+    echo "$!" > "$PIDFILE"
+fi
