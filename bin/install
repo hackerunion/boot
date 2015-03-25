@@ -101,9 +101,6 @@ ssh -T -i "$PRIKEY" "$HOST" << EOF
         git checkout master
         git config branch.master.sync true
         git config branch.master.syncNewFiles true
-        git submodule foreach --recursive git checkout master
-        git submodule foreach --recursive git config branch.master.sync true
-        git submodule foreach --recursive git config branch.master.syncNewFiles true
         popd
         pushd "$ROOT/boot"
         mkdir build 2> /dev/null

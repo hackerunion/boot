@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# This is run on the server to deploy the dockerized kernel, to synchronize the repositories, and to reload on error
+# This is run on the server to deploy the dockerized kernel, to synchronize the root repo, and to reload on error
+
 ROOT="$1"
 BOOT="$ROOT/boot"
-SRC="$ROOT/usr/src/kernel"
 SYNC="$BOOT/bin/opt/git-sync"
 
 POLL=60
@@ -16,28 +16,6 @@ if [ ! -x "$SYNC" ]; then
 fi
 
 sync() {
-  pushd "$BOOT" > /dev/null
-
-  if ! $SYNC; then
-    echo "Sync failed for boot, aborting."
-    return 1
-  fi
-
-  git checkout master
-
-  popd > /dev/null
-
-  pushd "$SRC" > /dev/null
-
-  if ! $SYNC; then
-    echo "Sync failed for kernel, aborting."
-    return 2
-  fi
-
-  git checkout master
-
-  popd > /dev/null
-  
   pushd "$ROOT" > /dev/null
 
   if ! $SYNC; then
