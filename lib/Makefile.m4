@@ -42,7 +42,10 @@ kernel-running: ; docker inspect --format="{{ .State.Running }}" _DOCKER_CONTAIN
 install: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_SECURE_KEY _LOCAL_SECURE_CERT _LOCAL_CONFIG _HOST_USER`@'_HOST_ADDR _HOST_REPOSITORY _HOST_HOME _HOST_SECURE_KEY _HOST_SECURE_CERT _HOST_CONFIG _HOST_ROOT _HOST_SSH_PORT
 install-clean: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_SECURE_KEY _LOCAL_SECURE_CERT _LOCAL_CONFIG _HOST_USER`@'_HOST_ADDR _HOST_REPOSITORY _HOST_HOME _HOST_SECURE_KEY _HOST_SECURE_CERT _HOST_CONFIG _HOST_ROOT _HOST_SSH_PORT yes
 
-poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
 connect: ; ssh -i _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR
+connect-kernel: ; read -p "Username: " NAME ; ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT $$NAME@_HOST_ADDR
+connect-kernel-exec: ; read -p "Username: " NAME ; exec ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT $$NAME@_HOST_ADDR
+
+poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
 local: ; echo "TODO"
 clean: ; rm $(build)/* 

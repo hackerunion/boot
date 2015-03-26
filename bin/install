@@ -64,7 +64,7 @@ if echo $RESP | grep -qvi '^ye\?s\?$'; then
   exit 7
 fi
 
-echo "Reaping any unwanted processes..."
+echo "Aborting old runtime..."
 ssh -Ti "$PRIKEY" "$HOST" << EOF
   crontab -r 
   killall babysit agent
@@ -74,7 +74,7 @@ echo "Copying keys and local configuration..."
 scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$SSLKEY" "$SSLCERT" "$CONF" "$HOST":"$DEST"
 
 echo "Installing dependencies..."
-ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4 shellinabox
+ssh -ti "$PRIKEY" "$HOST" sudo yum --enablerepo=epel install -y git docker m4 shellinabox
 
 if [ -n "$CLEAN" ]; then
   echo "Cleaning up old repository..."
