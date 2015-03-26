@@ -4,7 +4,7 @@
 # Tested against AWS running Amazon Linux image
 
 if (( $# < 7 )); then
-  echo -e "Push complete server to a remote host.\n\nUsage: $0 public-key private-key secure-key secure-cert local-conf url repo remote-base-path remote-key-path remote-cert-path remote-conf-path remote-root-path ssh-port [clean: yes/no]\n"
+  echo -e "Push complete server to a remote host.\n\nUsage: $0 public-key private-key secure-key secure-cert local-conf url repo remote-base-path remote-key-path remote-cert-path remote-conf-path remote-root-path ssh-port shell-port [clean: yes/no]\n"
   exit 1
 fi
 
@@ -21,7 +21,8 @@ DESTCERT="${10}"
 DESTCONF="${11}"
 ROOT="${12}"
 SSHPORT="${13}"
-CLEAN="${14}"
+SHPORT="${14}"
+CLEAN="${15}"
 
 if [ ! -f "$PUBKEY" ]; then
   echo $PUBKEY
@@ -65,16 +66,14 @@ if echo $RESP | grep -qvi '^ye\?s\?$'; then
 fi
 
 echo "Aborting old runtime..."
-ssh -Ti "$PRIKEY" "$HOST" << EOF
-  crontab -r 
-  killall babysit agent
-EOF
+ssh -ti "$PRIKEY" "$HOST" crontab -r 
+ssh -ti "$PRIKEY" "$HOST" sudo killall babysit agent shellinaboxd
 
 echo "Copying keys and local configuration..."
 scp -i "$PRIKEY" "$PUBKEY" "$PRIKEY" "$SSLKEY" "$SSLCERT" "$CONF" "$HOST":"$DEST"
 
 echo "Installing dependencies..."
-ssh -ti "$PRIKEY" "$HOST" sudo yum --enablerepo=epel install -y git docker m4 shellinabox
+ssh -ti "$PRIKEY" "$HOST" sudo yum install -y git docker m4
 
 if [ -n "$CLEAN" ]; then
   echo "Cleaning up old repository..."
@@ -121,5 +120,23 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
   echo "* * * * * $AGENT" | crontab
   bash $AGENT
 EOF
+
+if (( $SHPORT > 0 )); then
+  echo "Installing web shell..."
+  ssh -ti "$PRIKEY" "$HOST" sudo yum --enablerepo=epel install -y shellinabox
+
+  echo "Creating guest user..."
+  ssh -ti "$PRIKEY" "$HOST" 'sudo useradd guest -p `openssl passwd -1 "guest"` -m -d /home/guest -s /bin/bash'
+
+  echo "Copying helper script..."
+  ssh -ti "$PRIKEY" "$HOST" sudo cp "$ROOT/boot/bin/webssh" "/home/guest/"
+  
+  echo "Setting permissions..."
+  ssh -ti "$PRIKEY" "$HOST" sudo chown guest:guest "/home/guest/webssh"
+  ssh -ti "$PRIKEY" "$HOST" sudo chmod u+rx "/home/guest/webssh"
+
+  echo "Starting web shell..."
+  ssh -ti "$PRIKEY" "$HOST" sudo -u guest nohup shellinaboxd -t -b --port=$SHPORT --service=/:guest:guest:HOME:\'/home/guest/webssh localhost $SSHPORT \'
+fi
 
 echo "Done!"
