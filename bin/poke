@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if (( $# < 4 )); then
+  echo -e "Ensure agent is active on remote.\n\nUsage: $0 private-key url remote-base-path remote-root-path\n"
+  exit 1
+fi
+
+PRIKEY="$1"
+HOST="$2"
+DEST="$3"
+ROOT="$4"
+
+if [ ! -f "$PRIKEY" ]; then
+  echo "Your private key does not exist."
+  exit 1
+fi
+
+echo "Ensuring that the agent is running on remote..."
+echo "$ROOT/boot/bin/babysit $DEST/local/agent.pid $ROOT/boot/bin/agent $ROOT && echo Agent poked successfully!" | ssh -T -i "$PRIKEY" "$HOST"
