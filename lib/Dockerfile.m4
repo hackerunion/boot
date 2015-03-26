@@ -6,10 +6,8 @@ USER root
 
 # TODO: figure out how to properly avoid release file expiration (based on old image?)
 RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
-    cron ifelse(_SSH_PORT, `', `', ` \
-    openssh-server
-
-EXPOSE _SSH_PORT')
+    cron ifelse(_SERVER_SSH_PORT, `', `', ` \
+    openssh-server')
 
 ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_ROOT=_SERVER_ROOT \
@@ -22,8 +20,8 @@ ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     COOKIE_SECRET=_COOKIE_SECRET \
     SERVER_SECURE_KEY=_SERVER_SECURE_KEY \
     SERVER_SECURE_CERT=_SERVER_SECURE_CERT \
-    NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules \
-    SSH_PORT=_SSH_PORT
+    SERVER_SSH_PORT=_SERVER_SSH_PORT \
+    NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules
 
 ADD ./build/package.json /tmp/package.json
 RUN cd /tmp && npm install -g
@@ -34,4 +32,4 @@ ADD ./build/cert.pem _SERVER_SECURE_CERT
 VOLUME _SERVER_ROOT
 WORKDIR _SERVER_ROOT
 
-EXPOSE _SERVER_PORT _SERVER_SECURE_PORT
+EXPOSE _SERVER_PORT _SERVER_SECURE_PORT ifelse(_SERVER_SSH_PORT, `', `', `_SERVER_SSH_PORT')

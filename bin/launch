@@ -2,7 +2,7 @@
 
 PID=""
 DEBUG="$1"
-SSH="$2"
+SSH="$SERVER_SSH_PORT"
 MAX=30
 
 shutdown_server() {
