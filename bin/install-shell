@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Install the web-based SSH client
+# TODO: rewrite this to use a proper deployment framework
+
+if (( $# < 10 )); then
+  echo -e "Push web-based shell to a remote host.\n\nUsage: $0 web-user web-home web-bin web-ssh web-path private-key secure-key secure-cert url ssh-port\n"
+  exit 1
+fi
+
+WEBUSER="$1"
+WEBHOME="$2"
+WEBBIN="$3"
+WEBPORT="$4"
+WEBPATH="$5"
+PRIKEY="$6"
+SSLKEY="$7"
+SSLCERT="$8"
+HOST="$9"
+SSHPORT="${10}"
+
+if [ ! -f "$WEBBIN" ]; then
+  echo "The web binary doesn't exist."
+  exit 1
+fi
+
+if [ ! -f "$PRIKEY" ]; then
+  echo "Your private key does not exist."
+  exit 2
+fi
+
+if [ ! -f "$SSLKEY" ]; then
+  echo "Your secure server key does not exist."
+  exit 3
+fi
+
+if [ ! -f "$SSLCERT" ]; then
+  echo "Your secure server certificate does not exist."
+  exit 4
+fi
+
+echo -e "Push web-based shell to \"$HOST\"?\n"
+read -p "Continue? (y/n) " RESP
+
+if echo $RESP | grep -qvi '^ye\?s\?$'; then
+  echo "Aborting!"
+  exit 4
+fi
+
+echo "Removing old processes..."
+ssh -ti "$PRIKEY" "$HOST" sudo killall shellinaboxd
+
+echo "Installing web shell..."
+ssh -ti "$PRIKEY" "$HOST" sudo yum --enablerepo=epel install -y shellinabox
+
+echo "Creating guest user..."
+ssh -ti "$PRIKEY" "$HOST" sudo useradd $WEBUSER -p '$(openssl passwd -1 `openssl rand -base64 32`)' -m -d $WEBHOME -s /bin/bash
+
+echo "Copying keys and scripts..."
+scp -i "$PRIKEY" "$SSLKEY" "$SSLCERT" "$WEBBIN" "$HOST":"/tmp"
+
+echo "Moving and managing permissions..."
+ssh -ti "$PRIKEY" "$HOST" sudo mv "/tmp/`basename $SSLKEY`" "/tmp/`basename $SSLCERT`" "/tmp/`basename $WEBBIN`" "$WEBHOME"
+ssh -ti "$PRIKEY" "$HOST" sudo "sh -c 'cat $WEBHOME/`basename $SSLKEY` $WEBHOME/`basename $SSLCERT` > $WEBHOME/certificate.pem'"
+ssh -ti "$PRIKEY" "$HOST" sudo chown -R "$WEBUSER":"$WEBUSER" "$WEBHOME"
+ssh -ti "$PRIKEY" "$HOST" sudo chmod u+x "$WEBHOME/`basename $WEBBIN`"
+
+echo "Starting the web-based shell..."
+ssh -ti "$PRIKEY" "$HOST" sudo -u "$WEBUSER" nohup shellinaboxd -c $WEBHOME -b --port=$WEBPORT --service=$WEBPATH:$WEBUSER:$WEBUSER:HOME:\'$WEBHOME/`basename $WEBBIN` ${HOST#*@} $SSHPORT \'
+
+echo "Done!"
