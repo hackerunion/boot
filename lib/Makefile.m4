@@ -47,6 +47,10 @@ install-shell: ; $(bin)/install-shell _SHELL_USER _SHELL_HOME _SHELL_BIN _SHELL_
 connect: ; ssh -i _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR
 connect-kernel: ; read -p "Username: " NAME ; ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT $$NAME@_HOST_ADDR
 
+permissions-freeze: ; cp -i $(root)/etc/permissions.acl /tmp/permissions.acl.frozen
+permissions-thaw: ; cp -i /tmp/permissions.acl.frozen $(root)/etc/permissions.acl
+
 poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
-local: ; echo "TODO"
 clean: ; rm $(build)/* 
+
+.PHONY: use-these-targets-to-manage-your-server info make dockerfile node https https-cert user user-with-push docker-build docker-build-no-cache docker-run docker-run-no-build kernel-development kernel-development-no-build kernel-boot kernel-boot-no-build kernel-halt kernel-halt-and-block kernel-running install install-clean install-shell connect connect-kernel poke clean
