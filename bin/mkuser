@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: needs to add user's group or else it wont exist
+
 USERNAME="$1"
 USERID="$2"
 SECRET="$3"
