@@ -24,7 +24,8 @@ db    db d8b   db d888888b  .d88b.  d8b   db
 88    88 88 V8o88    88    88    88 88 V8o88 
 88b  d88 88  V888   .88.   `8b  d8' 88  V888 
 ~Y8888P' VP   V8P Y888888P  `Y88P'  VP   V8P 
-EOF 
+
+EOF
 
 read -p "Username: " NAME
 exec ssh -o PubkeyAuthentication=no -p $PORT $NAME@$HOST
