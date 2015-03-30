@@ -50,6 +50,7 @@ connect-kernel: ; read -p "Username: " NAME ; ssh -o PubkeyAuthentication=no -p 
 permissions-freeze: ; cp -i $(root)/etc/permissions.acl /tmp/permissions.acl.frozen
 permissions-thaw: ; cp -i /tmp/permissions.acl.frozen $(root)/etc/permissions.acl
 
+work: ; echo wip
 poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
 clean: ; rm $(build)/* 
 
