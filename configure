@@ -7,7 +7,7 @@ if [ -z "$REMOTE" ]; then
   read -p "Review and edit settings before continuing? (y/n) " RESP
 
   if echo "$RESP" | grep -qi '^ye\?s\?$'; then
-    "${VISUAL:-${EDITOR:-vi}}" ./lib/config.m4
+    "${VISUAL:-${EDITOR:-vi}}" -o ./lib/config.m4 ./lib/config.m4.secret ./lib/developer.m4.ignore
     
     read -p "Apply configuration? (y/n) " RESP
 

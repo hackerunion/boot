@@ -11,12 +11,12 @@ src = $(root)/usr/src/kernel
 use-these-targets-to-manage-your-server: info;
 info: ; cat $(boot)/Makefile | grep '^[a-z-]*:' | cut -d':' -f1
 
-make: $(lib)/config.m4 $(lib)/Makefile.m4 ; m4 -I $(lib) $(lib)/Makefile.m4 > Makefile
+make: ; m4 -I $(lib) $(lib)/Makefile.m4 > Makefile
 
-dockerfile: $(lib)/config.m4 $(lib)/Dockerfile.m4 ; m4 -I $(lib) $(lib)/Dockerfile.m4 > Dockerfile
-node: $(src)/package.json ; cp $(src)/package.json $(build)/package.json
+dockerfile: ; m4 -I $(lib) $(lib)/Dockerfile.m4 > Dockerfile
+node: ; cp $(src)/package.json $(build)/package.json
 
-https: _THIS_SECURE_KEY _THIS_SECURE_CERT ; cp _THIS_SECURE_KEY $(build)/key.pem ; cp _THIS_SECURE_CERT $(build)/cert.pem
+https: ; cp _THIS_SECURE_KEY $(build)/key.pem ; cp _THIS_SECURE_CERT $(build)/cert.pem
 https-cert: ; $(bin)/mkcert $(build)/insecure-key.pem $(build)/insecure-cert.pem
 
 user: ; $(bin)/mkuser _SERVER_USERNAME _SERVER_UID _SERVER_SECRET _THIS_ROOT
@@ -44,14 +44,33 @@ install-clean: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_SECU
 
 install-shell: ; $(bin)/install-shell _SHELL_USER _SHELL_HOME _SHELL_BIN _SHELL_PORT _SHELL_PATH _LOCAL_PRIVATE_KEY _SHELL_SECURE_KEY _SHELL_SECURE_CERT _HOST_USER`@'_HOST_ADDR _HOST_SSH_PORT
 
+ssh-key-create: ; ssh-keygen -b 2048 -t rsa -f _CURRENT_PRIVATE_KEY -q -N "" ; mv defn(`_CURRENT_PRIVATE_KEY').pub _CURRENT_PUBLIC_KEY
+ssh-key-install: ; scp -o PubkeyAuthentication=no -P _HOST_SSH_PORT _CURRENT_PUBLIC_KEY _CURRENT_USERNAME`@'_HOST_ADDR:_SERVER_HOME`/'.ssh/authorized_keys
+
 connect: ; ssh -i _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR
-connect-kernel: ; read -p "Username: " NAME ; ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT $$NAME@_HOST_ADDR
+connect-kernel: ; ssh -i _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR
+connect-kernel-password: ; ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR
 
 permissions-freeze: ; cp -i $(root)/etc/permissions.acl /tmp/permissions.acl.frozen
 permissions-thaw: ; cp -i /tmp/permissions.acl.frozen $(root)/etc/permissions.acl
 
-work: ; echo wip
-poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
-clean: ; rm $(build)/* 
+lsyncd: ; ( type lsyncd && m4 -I $(lib) $(lib)/sync.m4 > $(build)/sync.cfg ) || ( echo "Please install lsyncd to continue." && false )
 
-.PHONY: use-these-targets-to-manage-your-server info make dockerfile node https https-cert user user-with-push docker-build docker-build-no-cache docker-run docker-run-no-build kernel-development kernel-development-no-build kernel-boot kernel-boot-no-build kernel-halt kernel-halt-and-block kernel-running install install-clean install-shell connect connect-kernel poke clean
+sandbox: lsyncd ; lsyncd $(build)/sync.cfg
+sandbox-root: lsyncd ; sudo lsyncd $(build)/sync.cfg
+sandbox-init: lsyncd ; mkdir -p _LOCAL_SANDBOX ; ssh -i _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR mkdir -p _SERVER_SANDBOX
+
+rsync: ; rsync -a -e '/usr/bin/ssh -i _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR _LOCAL_SANDBOX :_SERVER_SANDBOX
+rsync-password: ; rsync -a -e '/usr/bin/ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR _LOCAL_SANDBOX :_SERVER_SANDBOX
+
+poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
+clean: ; rm $(build)/*
+
+hack-init: ssh-key-create ssh-key-install sandbox-init 
+hack-help: ; echo -e "$$(tput setaf 4)README: $$(tput smso)_LOCAL_SANDBOX$$(tput sgr0)$$(tput setaf 4) will be synchronized with $$(tput smso)_SERVER_URI:_SERVER_SANDBOX$$(tput sgr0)$$(tput setaf 4) until you kill this process$$(tput sgr0)"
+
+hack-now-root: hack-help sandbox-root
+hack-now: hack-help sandbox
+
+hack-new: hack-init hack-now
+hack-new-root: hack-init hack-now-root
