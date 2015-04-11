@@ -100,11 +100,11 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
   echo github.com \
     ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ== \
       > "$DEST/.ssh/known_hosts"
-  chmod -R go-rwx "$DEST/.ssh" "$DEST/local"
+  chmod -R go-rwx "$DEST/.ssh" "$DEST/local" "$DESTKEY" "$DESTCERT" "$DESTCONF"
   newgrp docker
   git config --global user.name "root"
   git config --global user.email "root@localhost"
-  (  [ ! -d "$ROOT" ] || rmdir "$ROOT" 2> /dev/null ) && git clone --progress --recursive "$REPO" "$ROOT"
+  ( [ ! -d "$ROOT" ] || rmdir "$ROOT" 2> /dev/null ) && git clone --progress --recursive "$REPO" "$ROOT"
   pushd "$ROOT"
   git checkout master
   git config branch.master.sync true
