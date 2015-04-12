@@ -4,20 +4,21 @@
 # TODO: rewrite this to use a proper deployment framework
 
 if (( $# < 10 )); then
-  echo -e "Push web-based shell to a remote host.\n\nUsage: $0 web-user web-home web-bin web-ssh web-path private-key secure-key secure-cert url ssh-port\n"
+  echo -e "Push web-based shell to a remote host.\n\nUsage: $0 domain-name web-user web-home web-bin web-ssh web-path private-key secure-key secure-cert url ssh-port\n"
   exit 1
 fi
 
-WEBUSER="$1"
-WEBHOME="$2"
-WEBBIN="$3"
-WEBPORT="$4"
-WEBPATH="$5"
-PRIKEY="$6"
-SSLKEY="$7"
-SSLCERT="$8"
-HOST="$9"
-SSHPORT="${10}"
+FQDN="$1"
+WEBUSER="$2"
+WEBHOME="$3"
+WEBBIN="$4"
+WEBPORT="$5"
+WEBPATH="$6"
+PRIKEY="$7"
+SSLKEY="$8"
+SSLCERT="$9"
+HOST="${10}"
+SSHPORT="${11}"
 
 if [ ! -f "$WEBBIN" ]; then
   echo "The web binary doesn't exist."
@@ -61,8 +62,9 @@ scp -i "$PRIKEY" "$SSLKEY" "$SSLCERT" "$WEBBIN" "$HOST":"/tmp"
 
 echo "Moving and managing permissions..."
 ssh -ti "$PRIKEY" "$HOST" sudo mv "/tmp/`basename $SSLKEY`" "/tmp/`basename $SSLCERT`" "/tmp/`basename $WEBBIN`" "$WEBHOME"
-ssh -ti "$PRIKEY" "$HOST" sudo "sh -c 'cat $WEBHOME/`basename $SSLKEY` $WEBHOME/`basename $SSLCERT` > $WEBHOME/certificate.pem'"
+ssh -ti "$PRIKEY" "$HOST" sudo "sh -c 'cat $WEBHOME/`basename $SSLKEY` $WEBHOME/`basename $SSLCERT` | tee $WEBHOME/certificate.pem $WEBHOME/certificate-$FQDN.pem'"
 ssh -ti "$PRIKEY" "$HOST" sudo chown -R "$WEBUSER":"$WEBUSER" "$WEBHOME"
+ssh -ti "$PRIKEY" "$HOST" sudo chmod go-rw "$WEBHOME/`basename $WEBBIN`"
 ssh -ti "$PRIKEY" "$HOST" sudo chmod u+x "$WEBHOME/`basename $WEBBIN`"
 
 echo "Starting the web-based shell..."
