@@ -1,16 +1,17 @@
 #!/bin/bash
 
-if (( $# < 2 )); then
-  echo "$0: [pid-file] [bin] ...[args]"
+if (( $# < 3 )); then
+  echo "$0: [pid-file] [log-file] [bin] ...[args]"
   exit 1
 fi
 
 PIDFILE="$1"
-BIN="$2"
+LOGFILE="$2"
+BIN="$3"
 
-shift 2
+shift 3
 
 if [ ! -r "$PIDFILE" ] || ! pgrep -F "$PIDFILE" > /dev/null 2>&1; then
-    nohup "$BIN" "$@" > /tmp/$$.out 2> /tmp/$$.err &
+    nohup "$BIN" "$@" >> $LOGFILE 2>&1 &
     echo "$!" > "$PIDFILE"
 fi

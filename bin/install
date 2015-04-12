@@ -87,7 +87,7 @@ ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 
 echo "Wiring everything up..."
 
-AGENT="$ROOT/boot/bin/babysit $DEST/local/agent.pid $ROOT/boot/bin/agent $ROOT"
+AGENT="$ROOT/boot/bin/babysit $DEST/local/agent.pid $ROOT/boot/bin/agent $ROOT/var/log/agent $ROOT"
 
 ssh -Ti "$PRIKEY" "$HOST" << EOF
   pushd "$DEST"
