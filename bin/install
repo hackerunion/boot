@@ -87,12 +87,12 @@ ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 
 echo "Wiring everything up..."
 
-AGENT="$ROOT/boot/bin/babysit $DEST/local/agent.pid $ROOT/boot/bin/agent $ROOT/var/log/agent $ROOT"
+AGENT="$ROOT/boot/bin/babysit $DEST/local/agent.pid $ROOT/var/log/agent $ROOT/boot/bin/agent $ROOT"
 
 ssh -Ti "$PRIKEY" "$HOST" << EOF
   pushd "$DEST"
   [ -d "$DEST/.ssh" ] || mkdir "$DEST/.ssh"
-  [ -d "$DEST/local" ] || mkdir "$DEST/local"
+  rm -fr "$DEST/local" && mkdir "$DEST/local"
   mv "$DEST/`basename $PRIKEY`" "$DEST/`basename $PUBKEY`" "$DEST/.ssh"
   mv "$DEST/`basename $SSLKEY`" "$DESTKEY"
   mv "$DEST/`basename $SSLCERT`" "$DESTCERT"
