@@ -116,8 +116,11 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
   ./configure yes
   make docker-build
   popd
-  echo "* * * * * $AGENT" | crontab
-  bash $AGENT
 EOF
+
+echo "Starting agent..."
+
+ssh -ti "$PRIKEY" "$HOST" sudo $AGENT
+ssh -ti "$PRIKEY" "$HOST" sudo bash -c 'echo "* * * * * $AGENT" | crontab'
 
 echo "Done!"

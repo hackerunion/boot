@@ -2,7 +2,6 @@
 
 # This is run on the server to deploy the dockerized kernel, to synchronize the root repo, and to reload on error
 
-sudo bash <<EOF
 ROOT="$1"
 BOOT="$ROOT/boot"
 SYNC="$BOOT/bin/opt/git-sync"
@@ -127,4 +126,3 @@ function main() {
 
 echo "Supervising agent running on remote server."
 main
-EOF
