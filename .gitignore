@@ -3,9 +3,9 @@
 *.secret
 
 # Build files
-build/*
-Makefile
-Dockerfile
+host/build/*
+host/Makefile
+host/Dockerfile
 
 # Logs
 logs
