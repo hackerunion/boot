@@ -23,6 +23,8 @@ ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_SECURE_CERT=_SERVER_SECURE_CERT \
     SERVER_SSH_PORT=_SERVER_SSH_PORT \
     SHELL_URI=_SHELL_URI \
+    HOST_UID=_THIS_UID \
+    HOST_GID=_THIS_GID \
     NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules
 
 ADD ./build/package.json /tmp/package.json

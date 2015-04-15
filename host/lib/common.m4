@@ -1,5 +1,10 @@
 ifdef(`_REMOTE', sinclude(_HOST_CONFIG))
 
+define(`_NL',`
+')
+
+define(`_THIS_UID', translit(esyscmd(`id -u'), _NL))
+define(`_THIS_GID', translit(esyscmd(`id -g'), _NL))
 define(`_THIS_ROOT', ifdef(`_REMOTE', _HOST_ROOT, _LOCAL_ROOT))
 define(`_THIS_PORT', ifdef(`_REMOTE', _HOST_PORT, _LOCAL_PORT))
 define(`_THIS_CONFIG', ifdef(`_REMOTE', _HOST_CONFIG, _LOCAL_CONFIG))
