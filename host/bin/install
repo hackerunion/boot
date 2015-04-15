@@ -87,7 +87,7 @@ ssh -ti "$PRIKEY" "$HOST" sudo service docker restart
 
 echo "Wiring everything up..."
 
-AGENT="$ROOT/boot/bin/babysit $DEST/local/agent.pid $ROOT/var/log/agent $ROOT/boot/bin/agent $ROOT"
+AGENT="$ROOT/boot/host/bin/babysit $DEST/local/agent.pid $ROOT/var/log/agent $ROOT/boot/host/bin/agent $ROOT"
 
 ssh -Ti "$PRIKEY" "$HOST" << EOF
   pushd "$DEST"
@@ -110,7 +110,7 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
   git config branch.master.sync true
   git config branch.master.syncNewFiles true
   popd
-  pushd "$ROOT/boot"
+  pushd "$ROOT/boot/host"
   mkdir build 2> /dev/null
   chmod -R u+x ./configure ./bin
   ./configure yes

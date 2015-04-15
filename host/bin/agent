@@ -3,7 +3,7 @@
 # This is run on the server to deploy the dockerized kernel, to synchronize the root repo, and to reload on error
 
 ROOT="$1"
-BOOT="$ROOT/boot"
+BOOT="$ROOT/boot/host"
 SYNC="$BOOT/bin/opt/git-sync"
 
 POLL=300        # 5m
