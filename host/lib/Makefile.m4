@@ -3,13 +3,14 @@ include(`common.m4')
 
 root = _THIS_ROOT
 boot = $(root)/boot
+host = $(root)/boot/host
 bin = $(root)/boot/host/bin
 lib = $(root)/boot/host/lib
 build = $(root)/boot/host/build
 src = $(root)/usr/src/kernel
 
 use-these-targets-to-manage-your-server: info;
-info: ; cat $(boot)/Makefile | grep '^[a-z-]*:' | cut -d':' -f1
+info: ; cat $(host)/Makefile | grep '^[a-z-]*:' | cut -d':' -f1
 
 make: ; m4 -I $(lib) $(lib)/Makefile.m4 > Makefile
 
