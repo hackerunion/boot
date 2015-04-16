@@ -16,4 +16,4 @@ if [ ! -f "$PRIKEY" ]; then
 fi
 
 echo "Ensuring that the agent is running on remote..."
-echo "$ROOT/boot/host/bin/babysit $DEST/local/agent.pid $ROOT/var/log/agent $ROOT/boot/host/bin/agent $ROOT && echo Agent poked successfully!" | ssh -T -i "$PRIKEY" "$HOST"
+echo "sudo $ROOT/boot/host/bin/babysit $DEST/local/agent.pid $ROOT/var/log/agent $ROOT/boot/host/bin/agent $ROOT && echo Agent poked successfully!" | ssh -ti "$PRIKEY" "$HOST"

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Invoke with "/abs/path/to/script" and "save"
+
+if [[ "$#" = 2 ]]; then
+  if [[ "$2" == "save" ]]; then
+    export SUDO_SCRIPT=$1 EDITOR=$0 && sudo -E visudo
+  else
+    echo "Usage: $0 abs-path-to-script {save}"
+    exit 1
+  fi
+fi
+
+if [[ "$#" = 1 && -n "$SUDO_SCRIPT" && "$SUDO_SCRIPT" = /* && -f "$SUDO_SCRIPT" ]]; then
+  if [ -z "`sudo grep -F "$SUDO_SCRIPT" /etc/sudoers`" ]; then
+    sudo chown root "$SUDO_SCRIPT"
+    sudo chmod 700 "$SUDO_SCRIPT"
+    sudo chown root "`dirname $SUDO_SCRIPT`"
+    sudo chmod 755 "`dirname $SUDO_SCRIPT`"
+
+    echo "ALL ALL=(root) NOPASSWD: $SUDO_SCRIPT" >> $1
+    fi
+  fi
+  
+  exit 0
+fi
