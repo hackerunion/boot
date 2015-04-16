@@ -120,7 +120,7 @@ EOF
 
 echo "Starting agent..."
 
-ssh -ti "$PRIKEY" "$HOST" sudo bash -c 'echo "* * * * * $AGENT" | crontab'
+ssh -ti "$PRIKEY" "$HOST" sudo "echo '* * * * * $AGENT' | sudo crontab"
 ssh -ti "$PRIKEY" "$HOST" sudo "$AGENT"
 
 echo "Done!"
