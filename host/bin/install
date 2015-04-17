@@ -25,7 +25,6 @@ ROOT="${12}"
 CLEAN="${13}"
 
 if [ ! -f "$PUBKEY" ]; then
-  echo $PUBKEY
   echo "Your public key does not exist."
   exit 2
 fi
@@ -114,13 +113,12 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
   mkdir build 2> /dev/null
   chmod -R u+x ./configure ./bin
   ./configure yes
-  make docker-build
-  popd
 EOF
+#  make docker-build
+#  popd
+#EOF
 
 echo "Starting agent..."
-
-ssh -ti "$PRIKEY" "$HOST" sudo "echo '* * * * * $AGENT' | sudo crontab"
-ssh -ti "$PRIKEY" "$HOST" sudo "$AGENT"
+ssh -ti "$PRIKEY" "$HOST" "sudo /bin/cp -TRf $DEST/.ssh ~root/.ssh && echo '* * * * * $AGENT' | sudo crontab && $AGENT"
 
 echo "Done!"
