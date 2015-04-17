@@ -35,7 +35,7 @@ kernel-development-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker
 kernel-boot: docker-build kernel-boot-no-build ; 
 kernel-boot-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run -d -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT -p _THIS_SECURE_PORT:_SERVER_SECURE_PORT ifelse(_SSH_PORT, `', `', `-p '_THIS_SSH_PORT`:'_SERVER_SSH_PORT) --name _DOCKER_CONTAINER _DOCKER_IMAGE _SERVER_ROOT/boot/bin/launch kernel
 
-kernel-halt: ; docker kill --signal=TERM _DOCKER_CONTAINER
+kernel-halt: ; docker kill --signal=TERM _DOCKER_CONTAINER > /dev/null 2>&1
 kernel-halt-and-block: kernel-halt ; { while true; do sleep 1; docker inspect --format="{{ .State.Running }}" _DOCKER_CONTAINER | grep -qi false && exit 0; done }
 
 kernel-running: ; docker inspect --format="{{ .State.Running }}" _DOCKER_CONTAINER | grep -qi 'true'

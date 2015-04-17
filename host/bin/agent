@@ -59,6 +59,13 @@ function boot() {
   popd > /dev/null
 }
 
+function try_halt() {
+  pushd $BOOT > /dev/null
+  echo "Making sure kernel isn't running..."
+  make kernel-halt-and-block
+  popd > /dev/null
+}
+
 function halt() {
   pushd $BOOT > /dev/null
   echo "Stopping kernel in docker..."
@@ -124,5 +131,5 @@ function main() {
   done
 }
 
-echo "Supervising agent running on remote server."
+echo "[`date`] Agent started"
 main
