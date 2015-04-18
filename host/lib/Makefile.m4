@@ -40,6 +40,8 @@ kernel-halt-and-block: kernel-halt ; { while true; do sleep 1; docker inspect --
 
 kernel-running: ; docker inspect --format="{{ .State.Running }}" _DOCKER_CONTAINER | grep -qi 'true'
 
+kernel-locked: ; test -f _THIS_ROOT/var/lock/kernel/run
+
 install: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_SECURE_KEY _LOCAL_SECURE_CERT _LOCAL_CONFIG _HOST_USER`@'_HOST_ADDR _HOST_REPOSITORY _HOST_HOME _HOST_SECURE_KEY _HOST_SECURE_CERT _HOST_CONFIG _HOST_ROOT
 install-clean: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_SECURE_KEY _LOCAL_SECURE_CERT _LOCAL_CONFIG _HOST_USER`@'_HOST_ADDR _HOST_REPOSITORY _HOST_HOME _HOST_SECURE_KEY _HOST_SECURE_CERT _HOST_CONFIG _HOST_ROOT yes
 

@@ -54,23 +54,20 @@ function sync_needed() {
 
 function boot() {
   pushd $BOOT > /dev/null
-  echo "Launching kernel in docker..."
+  echo "Booting kernel..."
   make kernel-boot-no-build
-  popd > /dev/null
-}
-
-function try_halt() {
-  pushd $BOOT > /dev/null
-  echo "Making sure kernel isn't running..."
-  make kernel-halt-and-block
   popd > /dev/null
 }
 
 function halt() {
   pushd $BOOT > /dev/null
-  echo "Stopping kernel in docker..."
+  echo "Halting kernel..."
   make kernel-halt-and-block
   popd > /dev/null
+}
+
+function try_halt() {
+  halt > /dev/null 2>&1
 }
 
 function wait_for_boot() {
@@ -81,53 +78,70 @@ function wait_for_boot() {
   popd > /dev/null
 }
 
-function poll_state() {
+function invalid() {
+  ( ( ! make kernel-running && make kernel-locked ) || ( make kernel-running && ! make kernel-locked ) ) > /dev/null 2>&1
+}
+
+function state() {
   pushd $BOOT > /dev/null
   
+  if invalid; then
+    echo "invalid"
+  elif make kernel-running > /dev/null 2>&1; then
+    echo "running"
+  else
+    echo "stopped"
+  fi
+    
+  popd > /dev/null
+}
+
+function action() {
+  pushd $BOOT > /dev/null
+  
+  if [ "$1" = "invalid" ]; then
+    echo "reboot"
   if (( `cat $CURRENT` >= $CYCLES )); then
     echo 0 > "$CURRENT"
     echo "refresh"
   elif sync_needed > /dev/null 2>&1; then
     echo "resync"
-  elif make kernel-running > /dev/null 2>&1; then
-    echo "running"
   else
-    echo "crash"
+    echo "continue"
   fi
-  popd > /dev/null
-  
+    
   echo "$(( `cat $CURRENT` + 1 ))" > "$CURRENT"
+  popd > /dev/null
 }
 
 function main() {
-  STATE='startup'
-
   # less attractive than a webhook, but decouples kernel from github
   while true; do
-    case "$STATE" in
-      startup|crash)
-        echo "Entering $STATE..."
-        try_sync
+    STATE="$(state)"
+    ACTION="$(action $STATE)"
+
+    echo "[`date`] $STATE => $ACTION"
+
+    case "$ACTION" in
+      reboot)
+        try_halt
         boot
         wait_for_boot
-        echo "Done! ($STATE)"
+        echo "[`date`] Done"
         ;;
 
       refresh|resync)
-        echo "Entering $STATE..."
-        halt
+        [ "$STATE" = "running" ] && halt
         try_sync
         boot
         wait_for_boot
-        echo "Done! ($STATE)"
+        echo "[`date`] Done"
         ;;
 
       *)
-        echo "Mark ($STATE): `date` (`cat $CURRENT` / $CYCLES) [${POLL}s]"
+        echo "[`date`] Status (`cat $CURRENT` / $CYCLES) [${POLL}s]"
         sleep $POLL;
     esac
-    
-    STATE="$(poll_state)"
   done
 }
 
