@@ -101,7 +101,7 @@ function action() {
   
   if [ "$1" = "invalid" ]; then
     echo "reboot"
-  if (( `cat $CURRENT` >= $CYCLES )); then
+  elif (( `cat $CURRENT` >= $CYCLES )); then
     echo 0 > "$CURRENT"
     echo "refresh"
   elif sync_needed > /dev/null 2>&1; then
