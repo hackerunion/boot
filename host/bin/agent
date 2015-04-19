@@ -99,7 +99,7 @@ function state() {
 function action() {
   pushd $BOOT > /dev/null
   
-  if [ "$1" = "invalid" ]; then
+  if [ "$1" = "invalid" -o "$1" = "stopped" ]; then
     echo "reboot"
   elif (( `cat $CURRENT` >= $CYCLES )); then
     echo 0 > "$CURRENT"
@@ -120,7 +120,7 @@ function main() {
     STATE="$(state)"
     ACTION="$(action $STATE)"
 
-    echo "[`date`] $STATE => $ACTION"
+    echo "[`date`] Next: $STATE => $ACTION"
 
     case "$ACTION" in
       reboot)
