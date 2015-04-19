@@ -108,9 +108,9 @@ function action() {
     echo "resync"
   else
     echo "continue"
+    echo "$(( `cat $CURRENT` + 1 ))" > "$CURRENT"
   fi
-    
-  echo "$(( `cat $CURRENT` + 1 ))" > "$CURRENT"
+
   popd > /dev/null
 }
 
