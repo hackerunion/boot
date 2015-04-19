@@ -118,6 +118,6 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
 EOF
 
 echo "Starting agent..."
-ssh -ti "$PRIKEY" "$HOST" "sudo /bin/cp -TRf $DEST/.ssh ~root/.ssh && echo '* * * * * $AGENT' | sudo crontab && $AGENT"
+ssh -ti "$PRIKEY" "$HOST" "sudo /bin/cp -TRf $DEST/.ssh ~root/.ssh && echo '* * * * * $AGENT' | sudo crontab && sudo $AGENT"
 
 echo "Done!"
