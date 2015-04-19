@@ -79,7 +79,7 @@ function wait_for_boot() {
 }
 
 function invalid() {
-  ( ( ! make kernel-running && make kernel-locked ) || ( make kernel-running && ! make kernel-locked ) ) > /dev/null 2>&1
+  ( ! make kernel-running && make kernel-locked ) > /dev/null 2>&1
 }
 
 function state() {
