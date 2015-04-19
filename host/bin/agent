@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # This is run on the server to deploy the dockerized kernel, to synchronize the root repo, and to reload on error
-whoami
 
 ROOT="$1"
 BOOT="$ROOT/boot/host"
@@ -20,6 +19,10 @@ fi
 
 sync() {
   pushd "$ROOT" > /dev/null
+  
+  if ! test -x "$SYNC"; then
+    chmod u+x "$SYNC"
+  fi
 
   if ! $SYNC; then
     echo "Sync failed for root, aborting."
@@ -123,7 +126,7 @@ function main() {
     STATE="$(state)"
     ACTION="$(action $STATE)"
 
-    echo "[`date`] Next: $STATE => $ACTION (`whoami`)"
+    echo "[`date`] Next: $STATE => $ACTION"
 
     case "$ACTION" in
       reboot)
