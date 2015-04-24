@@ -48,7 +48,7 @@ install-clean: ; $(bin)/install _LOCAL_PUBLIC_KEY _LOCAL_PRIVATE_KEY _LOCAL_SECU
 install-shell: ; $(bin)/install-shell _HOST_FQDN _SHELL_USER _SHELL_HOME _SHELL_BIN _SHELL_PORT _SHELL_PATH _LOCAL_PRIVATE_KEY _SHELL_SECURE_KEY _SHELL_SECURE_CERT _HOST_USER`@'_HOST_ADDR _HOST_SSH_PORT
 
 ssh-key-create: ; ssh-keygen -b 2048 -t rsa -f _CURRENT_PRIVATE_KEY -q -N "" ; mv defn(`_CURRENT_PRIVATE_KEY').pub _CURRENT_PUBLIC_KEY
-ssh-key-install: ; ssh -ti _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR mkdir .ssh; scp -o PubkeyAuthentication=no -P _HOST_SSH_PORT _CURRENT_PUBLIC_KEY _CURRENT_USERNAME`@'_HOST_ADDR:_SERVER_HOME`/'.ssh/authorized_keys
+ssh-key-install: ; ssh -ti _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR mkdir -p .ssh; scp -o PubkeyAuthentication=no -P _HOST_SSH_PORT _CURRENT_PUBLIC_KEY _CURRENT_USERNAME`@'_HOST_ADDR:_SERVER_HOME`/'.ssh/authorized_keys
 
 connect: ; ssh -i _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR
 connect-kernel: ; ssh -i _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR
@@ -70,7 +70,7 @@ poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_
 clean: ; rm $(build)/*
 
 hack-init: ssh-key-create ssh-key-install sandbox-init 
-hack-help: ; echo -e "$$(tput setaf 4)README: $$(tput smso)_LOCAL_SANDBOX$$(tput sgr0)$$(tput setaf 4) will be synchronized with $$(tput smso)_SERVER_URI:_SERVER_SANDBOX$$(tput sgr0)$$(tput setaf 4) until you kill this process$$(tput sgr0)"
+hack-help: ; echo -e "$$(tput setaf 4)README: $$(tput smso)_LOCAL_SANDBOX$$(tput sgr0)$$(tput setaf 4) will be synchronized with $$(tput smso)_HOST_URI:_SERVER_SANDBOX$$(tput sgr0)$$(tput setaf 4) until you kill this process$$(tput sgr0)"
 
 hack-now-root: hack-help sandbox-root
 hack-now: hack-help sandbox
