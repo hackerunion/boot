@@ -67,6 +67,8 @@ rsync: ; rsync -a -e '/usr/bin/ssh -i _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CU
 rsync-password: ; rsync -a -e '/usr/bin/ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR _LOCAL_SANDBOX :_SERVER_SANDBOX
 
 poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
+resync: ; $(bin)/resync _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
+
 clean: ; rm $(build)/*
 
 hack-init: ssh-key-create ssh-key-install sandbox-init 

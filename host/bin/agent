@@ -8,12 +8,23 @@ SYNC="$BOOT/bin/opt/git-sync"
 
 POLL=300        # 5m
 CYCLES=144      # 5m * 144 = 12h
+FORCE=
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
 if [ ! -x "$SYNC" ]; then
   echo "Unable to find git-sync in boot repository. Exiting..."
   exit 1
 fi
+
+force() {
+  echo "[`date`] Resync requested"
+  FORCE=1
+}
+
+unforce() {
+  [ -n "$FORCE" ] && echo "[`date`] Resync request complete"
+  FORCE=
+}
 
 sync() {
   pushd "$ROOT" > /dev/null
@@ -34,10 +45,10 @@ sync() {
 
 function try_sync() {
   if sync; then
-    echo "Sync was successful"
+    echo -e "[`date`] `tput setaf 2`Success`tput sgr0`"
     return 0
   else
-    echo "Sync failed"
+    echo -e "[`date`] `tput setaf 5`Failure`tput sgr0`"
     return 1
   fi
 }
@@ -105,7 +116,8 @@ function action() {
   
   if [ "$1" = "invalid" -o "$1" = "stopped" ]; then
     echo "reboot"
-  elif (( `cat $CURRENT` >= $CYCLES )); then
+  elif (( `cat $CURRENT` >= $CYCLES )) || test -n "$FORCE"; then
+    unforce()
     echo 0 > "$CURRENT"
     echo "refresh"
   elif sync_needed > /dev/null 2>&1; then
@@ -148,6 +160,8 @@ function main() {
     esac
   done
 }
+
+trap force SIGUSR1
 
 echo "[`date`] Agent started"
 main
