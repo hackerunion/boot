@@ -117,7 +117,7 @@ function action() {
   if [ "$1" = "invalid" -o "$1" = "stopped" ]; then
     echo "reboot"
   elif (( `cat $CURRENT` >= $CYCLES )) || test -n "$FORCE"; then
-    unforce()
+    unforce
     echo 0 > "$CURRENT"
     echo "refresh"
   elif sync_needed > /dev/null 2>&1; then
