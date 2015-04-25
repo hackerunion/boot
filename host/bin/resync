@@ -16,4 +16,4 @@ if [ ! -f "$PRIKEY" ]; then
 fi
 
 echo "Requesting resync on remote..."
-echo "sudo kill -s SIGUSR1 \`cat $DEST/local/agent.pid\` && echo Resync request sent!" | ssh -ti "$PRIKEY" "$HOST"
+ssh -ti "$PRIKEY" "$HOST" "sudo kill -s SIGUSR1 \`cat $DEST/local/agent.pid\` && echo Resync request sent!"
