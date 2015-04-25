@@ -64,7 +64,7 @@ if echo $RESP | grep -qvi '^ye\?s\?$'; then
 fi
 
 echo "Removing old processes..."
-ssh -ti "$PRIKEY" "$HOST" crontab -r 
+ssh -ti "$PRIKEY" "$HOST" sudo crontab -r 
 ssh -ti "$PRIKEY" "$HOST" sudo killall babysit agent
 
 echo "Copying keys and local configuration..."
