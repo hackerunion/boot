@@ -17,12 +17,10 @@ if [ ! -x "$SYNC" ]; then
 fi
 
 force() {
-  echo "[`date`] Resync requested"
   FORCE=1
 }
 
 unforce() {
-  [ -n "$FORCE" ] && echo "[`date`] Resync request complete"
   FORCE=
 }
 
