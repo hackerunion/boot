@@ -6,7 +6,7 @@ ROOT="$1"
 BOOT="$ROOT/boot/host"
 SYNC="$BOOT/bin/opt/git-sync"
 
-POLL=300        # 5m
+POLL=60 # 300        # 1m
 CYCLES=144      # 5m * 144 = 12h
 FORCE="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$FORCE"
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
