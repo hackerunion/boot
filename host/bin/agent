@@ -8,7 +8,7 @@ SYNC="$BOOT/bin/opt/git-sync"
 
 POLL=300        # 5m
 CYCLES=144      # 5m * 144 = 12h
-FORCE=
+FORCE="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$FORCE"
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
 if [ ! -x "$SYNC" ]; then
@@ -17,11 +17,7 @@ if [ ! -x "$SYNC" ]; then
 fi
 
 force() {
-  FORCE=1
-}
-
-unforce() {
-  FORCE=
+  echo 1 > "$FORCE"
 }
 
 sync() {
@@ -43,10 +39,10 @@ sync() {
 
 function try_sync() {
   if sync; then
-    echo -e "[`date`] `tput setaf 2`Success`tput sgr0`"
+    echo -e "[`date`] ------------ SUCCESS ------------"
     return 0
   else
-    echo -e "[`date`] `tput setaf 5`Failure`tput sgr0`"
+    echo -e "[`date`] ************ FAIL ************"
     return 1
   fi
 }
@@ -114,9 +110,9 @@ function action() {
   
   if [ "$1" = "invalid" -o "$1" = "stopped" ]; then
     echo "reboot"
-  elif (( `cat $CURRENT` >= $CYCLES )) || test -n "$FORCE"; then
-    unforce
+  elif (( `cat $CURRENT` >= $CYCLES || `cat $FORCE` == 1 )); then
     echo 0 > "$CURRENT"
+    echo 0 > "$FORCE"
     echo "refresh"
   elif sync_needed > /dev/null 2>&1; then
     echo "resync"
