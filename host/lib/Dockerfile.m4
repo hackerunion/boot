@@ -25,7 +25,7 @@ ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SHELL_URI=_SHELL_URI \
     HOST_UID=_THIS_UID \
     HOST_GID=_THIS_GID \
-    NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules
+    NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules:/usr/local/lib/node_modules
 
 ADD ./build/package.json /tmp/package.json
 RUN cd /tmp && npm install -g
