@@ -6,6 +6,7 @@ USER root
 
 # TODO: figure out how to properly avoid release file expiration (based on old image?)
 RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
+    sudo \
     rsync \
     cron ifelse(_SERVER_SSH_PORT, `', `', ` \
     openssh-server')
