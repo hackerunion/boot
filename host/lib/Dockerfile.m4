@@ -8,6 +8,8 @@ USER root
 RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
     sudo \
     rsync \
+    nano \
+    busybox \
     cron ifelse(_SERVER_SSH_PORT, `', `', ` \
     openssh-server')
 

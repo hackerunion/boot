@@ -19,7 +19,6 @@ if [[ "$#" = 1 && -n "$SUDO_SCRIPT" && "$SUDO_SCRIPT" = /* && -f "$SUDO_SCRIPT" 
     sudo chmod 755 "`dirname $SUDO_SCRIPT`"
 
     echo "ALL ALL=(root) NOPASSWD: $SUDO_SCRIPT" >> $1
-    fi
   fi
   
   exit 0

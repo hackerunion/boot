@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: needs to add user's group or else it wont exist
-
 USERNAME="$1"
 USERID="$2"
 SECRET="$3"
@@ -10,7 +8,7 @@ SERVER_ROOT="$4"
 PASSWD=`cat "$SERVER_ROOT/etc/passwd.json"`
 
 if (( $# < 4 )); then
-  echo "$0: [username] [uid] [secret] [path-to-root]"
+  echo "$0: username uid secret path-to-root"
   exit 1
 fi
 
@@ -29,6 +27,9 @@ if echo "$PASSWD" | grep -q '{'; then
 fi
 
 SHADOW=$(openssl passwd -1 "$SECRET" 2> /dev/null)
-JSON="{ \"username\": \"$USERNAME\", \"password\": \"$SHADOW\", \"uid\": \"$USERID\", \"gid\": \"$USERID\", \"info\": \"managed user\", \"shell\": \"/sbin/nologin\", \"service\": false, \"uri\": null }"
+JSON="{ \"username\": \"$USERNAME\", \"password\": \"$SHADOW\", \"uid\": \"$USERID\", \"gid\": \"$USERID\", \"info\": \"managed user\", \"shell\": \"/bin/bash\", \"service\": false, \"uri\": null }"
 
+# Add user to passwd file
 echo -e "${PASSWD/[/[\n$JSON$TAIL}" > $SERVER_ROOT/etc/passwd.json
+
+# NOTE: this doesn't add the user's group to the group file. This will cause user creation to FAIL! Make sure you create the user's group too (see mkgroup).

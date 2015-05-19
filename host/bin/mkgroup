@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if (( $# < 3 )); then
+  echo "$0: group gid path-to-root [user1 user2 user3 ...]"
+  exit 1
+fi
+
+GROUPNAME="$1"
+GROUPID="$2"
+SERVER_ROOT="$3"
+
+shift 3
+
+MEMBERS="$@"
+GROUPJSON=`cat "$SERVER_ROOT/etc/group.json"`
+
+if echo "$GROUPJSON" | grep -q "\"gid\"\s*:\s*\"$GROUPID\""; then
+  echo "Group with GID $GROUPID already exists"
+  exit 0
+fi
+
+if echo "$GROUPJSON" | grep -q "\"group\"\s*:\s*\"$GROUPNAME\""; then
+  echo "Group with name $GROUPNAME already exists"
+  exit 0
+fi
+
+if echo "$GROUPJSON" | grep -q '{'; then
+  TAIL=",$TAIL"
+fi
+
+if test -n "$MEMBERS"; then
+  MEMBERS="\"`echo $MEMBERS | sed -e 's/ /", "/g'`\""
+fi
+
+JSON="{ \"group\": \"$GROUPNAME\", \"gid\": \"$GROUPID\", \"users\": [$MEMBERS] }"
+echo -e "${GROUPJSON/[/[\n$JSON$TAIL}" > $SERVER_ROOT/etc/group.json

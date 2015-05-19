@@ -21,7 +21,8 @@ https: ; cp _THIS_SECURE_KEY $(build)/key.pem ; cp _THIS_SECURE_CERT $(build)/ce
 https-cert: ; $(bin)/mkcert $(build)/insecure-key.pem $(build)/insecure-cert.pem
 
 user: ; $(bin)/mkuser _SERVER_USERNAME _SERVER_UID _SERVER_SECRET _THIS_ROOT
-user-with-push: user ; { cd $(root); git add etc/passwd.json; git commit -m 'Added server credentials'; git push; }
+group: ; $(bin)/mkgroup _SERVER_USERNAME _SERVER_UID _THIS_ROOT
+user-and-group: user group
 
 docker-build: dockerfile https node user; docker build --rm -t _DOCKER_IMAGE .
 docker-build-no-cache: dockerfile node user; docker build --no-cache=true --rm -t _DOCKER_IMAGE .
