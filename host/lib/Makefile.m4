@@ -20,9 +20,15 @@ node: ; cp $(src)/package.json $(build)/package.json
 https: ; cp _THIS_SECURE_KEY $(build)/key.pem ; cp _THIS_SECURE_CERT $(build)/cert.pem
 https-cert: ; $(bin)/mkcert $(build)/insecure-key.pem $(build)/insecure-cert.pem
 
-user: ; $(bin)/mkuser _SERVER_USERNAME _SERVER_UID _SERVER_SECRET _THIS_ROOT
-group: ; $(bin)/mkgroup _SERVER_USERNAME _SERVER_UID _THIS_ROOT
-user-and-group: user group
+server-user: ; $(bin)/mkuser _SERVER_USERNAME _SERVER_UID _SERVER_SECRET _SERVER_SHELL _THIS_ROOT
+server-group: ; $(bin)/mkgroup _SERVER_USERNAME _SERVER_UID _THIS_ROOT
+user: server-user server-group
+
+guest-user: ; $(bin)/mkuser _SERVER_GUEST_USERNAME _SERVER_GUEST_UID _SERVER_GUEST_SECRET _SERVER_GUEST_SHELL _THIS_ROOT
+guest-group: ; $(bin)/mkgroup _SERVER_GUEST_USERNAME _SERVER_GUEST_UID _THIS_ROOT
+guest: guest-user guest-group
+
+default-users: user guest
 
 docker-build: dockerfile https node user; docker build --rm -t _DOCKER_IMAGE .
 docker-build-no-cache: dockerfile node user; docker build --no-cache=true --rm -t _DOCKER_IMAGE .
