@@ -11,7 +11,9 @@ RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
     nano \
     busybox \
     cron ifelse(_SERVER_SSH_PORT, `', `', ` \
-    openssh-server')
+    openssh-server') ifdef(`_SERVER_EDITOR', ` \
+    _SERVER_EDITOR')
+
 
 ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_ROOT=_SERVER_ROOT \

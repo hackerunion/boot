@@ -53,6 +53,7 @@ define(`_SERVER_URI', `http://localhost:'_SERVER_PORT)
 define(`_SERVER_SECURE_KEY', `/etc/ssl/server/key.pem')
 define(`_SERVER_SECURE_CERT',`/etc/ssl/server/cert.pem')
 define(`_SERVER_RSYNC', `/usr/bin/rsync')
+define(`_SERVER_EDITOR', `vim')
 
 sinclude(_LOCAL_CONFIG)
 sinclude(_LOCAL_DEVELOPER_CONFIG)
