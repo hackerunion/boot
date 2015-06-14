@@ -10,6 +10,7 @@ RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
     rsync \
     nano \
     busybox \
+    jq \
     cron ifelse(_SERVER_SSH_PORT, `', `', ` \
     openssh-server') ifdef(`_SERVER_EDITOR', ` \
     _SERVER_EDITOR')
@@ -33,6 +34,7 @@ ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SHELL_URI=_SHELL_URI \
     HOST_UID=_THIS_UID \
     HOST_GID=_THIS_GID \
+    HOST_SSH_PORT=_HOST_SSH_PORT \
     NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules:/usr/local/lib/node_modules
 
 ADD ./build/package.json /tmp/package.json
