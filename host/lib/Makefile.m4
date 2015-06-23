@@ -75,6 +75,7 @@ rsync-password: ; rsync -a -e '/usr/bin/ssh -o PubkeyAuthentication=no -p _HOST_
 
 poke: ; $(bin)/poke _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
 resync: ; $(bin)/resync _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
+pause: ; $(bin)/pause _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR _HOST_HOME _HOST_ROOT
 
 clean: ; rm $(build)/*
 

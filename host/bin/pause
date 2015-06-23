@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if (( $# < 4 )); then
+  echo -e "Toggle pause state to temporarily take down kernel.\n\nUsage: $0 private-key url remote-base-path remote-root-path\n"
+  exit 1
+fi
+
+PRIKEY="$1"
+HOST="$2"
+DEST="$3"
+ROOT="$4"
+
+if [ ! -f "$PRIKEY" ]; then
+  echo "Your private key does not exist."
+  exit 1
+fi
+
+echo "Requesting pause on remote (toggle)..."
+ssh -ti "$PRIKEY" "$HOST" "sudo kill -s SIGUSR2 \`cat $DEST/local/agent.pid\` && echo Pause request sent!"

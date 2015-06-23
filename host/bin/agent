@@ -9,6 +9,7 @@ SYNC="$BOOT/bin/opt/git-sync"
 POLL=300        # 5m
 CYCLES=144      # 5m * 144 = 12h
 FORCE="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$FORCE"
+PAUSE="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$PAUSE"
 CURRENT="$(mktemp /tmp/host.XXXXXX)" && echo 0 > "$CURRENT"
 
 if [ ! -x "$SYNC" ]; then
@@ -18,6 +19,14 @@ fi
 
 force() {
   echo 1 > "$FORCE"
+}
+
+pause() {
+  if grep -q 0 "$PAUSE"; then
+    echo 1 > "$PAUSE"
+  else
+    echo 0 > "$PAUSE"
+  fi
 }
 
 sync() {
@@ -108,7 +117,9 @@ function state() {
 function action() {
   pushd $BOOT > /dev/null
   
-  if [ "$1" = "invalid" -o "$1" = "stopped" ]; then
+  if (( `cat $PAUSE` == 1 )); then
+    echo "pause"
+  elif [ "$1" = "invalid" -o "$1" = "stopped" ]; then
     echo "reboot"
   elif (( `cat $CURRENT` >= $CYCLES || `cat $FORCE` == 1 )); then
     echo 0 > "$CURRENT"
@@ -133,6 +144,11 @@ function main() {
     echo "[`date`] Next: $STATE => $ACTION"
 
     case "$ACTION" in
+      pause)
+        [ "$STATE" = "running" ] && halt
+        echo "[`date`] Done"
+        ;;
+
       reboot)
         try_halt
         boot
@@ -156,6 +172,7 @@ function main() {
 }
 
 trap force SIGUSR1
+trap pause SIGUSR2
 
 echo "[`date`] Agent started"
 main
