@@ -147,6 +147,7 @@ function main() {
       pause)
         [ "$STATE" = "running" ] && halt
         echo "[`date`] Done"
+        sleep $POLL
         ;;
 
       reboot)
