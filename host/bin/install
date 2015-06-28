@@ -55,9 +55,9 @@ if echo "$CLEAN" | grep -qiv '^ye\?s\?$'; then
 fi
 
 if echo "$NOCACHE" | grep -qiv '^ye\?s\?$'; then
-  DOCKER_BUILD="make docker-build-no-cache"
-else
   DOCKER_BUILD="make docker-build"
+else
+  DOCKER_BUILD="make docker-build-no-cache"
 fi
 
 echo -e "Push new server to \"$HOST\" based on \"$REPO\"?\n"
