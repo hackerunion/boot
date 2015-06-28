@@ -6,7 +6,7 @@
 # TODO: rewrite this to use a proper deployment framework
 
 if (( $# < 12 )); then
-  echo -e "Push complete server to a remote host.\n\nUsage: $0 public-key private-key secure-key secure-cert local-conf url repo remote-base-path remote-key-path remote-cert-path remote-conf-path remote-root-path [clean: yes/no]\n"
+  echo -e "Push complete server to a remote host.\n\nUsage: $0 public-key private-key secure-key secure-cert local-conf url repo remote-base-path remote-key-path remote-cert-path remote-conf-path remote-root-path [clean: yes/no] [no-cache: yes/no]\n"
   exit 1
 fi
 
@@ -23,6 +23,7 @@ DESTCERT="${10}"
 DESTCONF="${11}"
 ROOT="${12}"
 CLEAN="${13}"
+NOCACHE="${14}"
 
 if [ ! -f "$PUBKEY" ]; then
   echo "Your public key does not exist."
@@ -51,6 +52,12 @@ fi
 
 if echo "$CLEAN" | grep -qiv '^ye\?s\?$'; then
   CLEAN=""
+fi
+
+if echo "$NOCACHE" | grep -qiv '^ye\?s\?$'; then
+  DOCKER_BUILD="make docker-build-no-cache"
+else
+  DOCKER_BUILD="make docker-build"
 fi
 
 echo -e "Push new server to \"$HOST\" based on \"$REPO\"?\n"
@@ -113,7 +120,7 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
   mkdir build 2> /dev/null
   chmod -R u+x ./configure ./bin
   ./configure yes
-  make docker-build-no-cache
+  $DOCKER_BUILD
   popd
 EOF
 
