@@ -113,7 +113,7 @@ ssh -Ti "$PRIKEY" "$HOST" << EOF
   mkdir build 2> /dev/null
   chmod -R u+x ./configure ./bin
   ./configure yes
-  make docker-build
+  make docker-build-no-cache
   popd
 EOF
 
