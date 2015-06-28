@@ -8,13 +8,13 @@ USER root
 RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
     sudo \
     rsync \
+    rsyslog \
     nano \
     busybox \
     jq \
     cron ifelse(_SERVER_SSH_PORT, `', `', ` \
     openssh-server') ifdef(`_SERVER_EDITOR', ` \
     _SERVER_EDITOR')
-
 
 ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_ROOT=_SERVER_ROOT \
@@ -36,6 +36,13 @@ ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     HOST_GID=_THIS_GID \
     HOST_SSH_PORT=_HOST_SSH_PORT \
     NODE_PATH=/usr/local/lib/node_modules/kernel/node_modules:/usr/local/lib/node_modules
+
+# cron runs into a permissions issue; this avoids the problem
+RUN sed -i '/session\s*required\s*pam_loginuid.so/c\#session required pam_loginuid.so' /etc/pam.d/cron
+
+# manually start syslog and cron
+RUN service rsyslog start
+RUN service cron start
 
 ADD ./build/package.json /tmp/package.json
 RUN cd /tmp && npm install -g
