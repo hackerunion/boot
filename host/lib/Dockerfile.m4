@@ -16,15 +16,12 @@ RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y \
     openssh-server') ifdef(`_SERVER_EDITOR', ` \
     _SERVER_EDITOR')
 
-# manually start syslog and cron
+# manually start syslog and cron (to ensure files are present for later)
 RUN service rsyslog start
 RUN service cron start
 
 # cron runs into a permissions issue; this avoids the problem (file only exists after cron start)
 RUN sed -i '/session\s*required\s*pam_loginuid.so/c\#session required pam_loginuid.so' /etc/pam.d/cron
-
-# restart the cron service
-RUN service cron restart
 
 ENV PATH=$PATH:_SERVER_ROOT`/bin' \
     SERVER_ROOT=_SERVER_ROOT \

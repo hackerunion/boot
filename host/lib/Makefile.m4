@@ -62,8 +62,8 @@ ssh-key-create: ; ssh-keygen -b 2048 -t rsa -f _CURRENT_PRIVATE_KEY -q -N "" ; m
 ssh-key-install: ; ssh -ti _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR mkdir -p .ssh; scp -o PubkeyAuthentication=no -P _HOST_SSH_PORT _CURRENT_PUBLIC_KEY _CURRENT_USERNAME`@'_HOST_ADDR:_SERVER_HOME`/'.ssh/authorized_keys
 
 connect: ; ssh -i _LOCAL_PRIVATE_KEY _HOST_USER`@'_HOST_ADDR
-connect-kernel: ; ssh -i _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR
-connect-kernel-password: ; ssh -o PubkeyAuthentication=no -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR
+connect-kernel: ; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i _CURRENT_PRIVATE_KEY -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR
+connect-kernel-password: ; ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p _HOST_SSH_PORT _CURRENT_USERNAME`@'_HOST_ADDR
 
 permissions-freeze: ; cp -i $(root)/etc/permissions.acl /tmp/permissions.acl.frozen
 permissions-thaw: ; cp -i /tmp/permissions.acl.frozen $(root)/etc/permissions.acl

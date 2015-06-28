@@ -28,4 +28,4 @@ cat <<'EOF'
 EOF
 
 read -p "Username: " NAME
-exec ssh -o PubkeyAuthentication=no -p $PORT $NAME@$HOST
+exec ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p $PORT $NAME@$HOST
