@@ -30,6 +30,8 @@ guest: guest-user guest-group
 
 default-users: user guest
 
+docker-clean: ; docker rm $$(docker ps -a -q) ; docker rmi $$(docker images -q)
+
 docker-build: dockerfile https node user; docker build --rm -t _DOCKER_IMAGE .
 docker-build-no-cache: dockerfile node user; docker build --no-cache=true --rm -t _DOCKER_IMAGE .
 
