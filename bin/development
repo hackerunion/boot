@@ -10,11 +10,12 @@ if ! command -v nodemon > /dev/null 2>&1; then
   echo "Installed!"
 fi
 
+cd "$SERVER_ROOT/usr/src/kernel/"
+
 if (( $# >= 2 )); then
   echo "Staging: will run init scripts once!"
   DEBUG=$DEBUG KERNEL_HACKER=true SERVER_ONLY_INIT=true node ./bin/boot.js
   echo "Init complete. Running development server..."
 fi
 
-cd "$SERVER_ROOT/usr/src/kernel/"
 DEBUG=$DEBUG KERNEL_HACKER=true SERVER_NO_INIT=true nodemon ./bin/boot.js
