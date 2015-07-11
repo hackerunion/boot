@@ -3,6 +3,7 @@
 PID=""
 DEBUG="$1"
 SSH="$SERVER_SSH_PORT"
+LOGFILE="$SERVER_ROOT/var/log/kernel"
 MAX=30
 
 shutdown_server() {
@@ -41,7 +42,7 @@ echo "Launching kernel..."
 cd "$SERVER_ROOT/usr/src/kernel/"
 
 # can't run using npm since npm dies on signal
-DEBUG="$DEBUG" node ./bin/boot.js &
+DEBUG="$DEBUG" node ./bin/boot.js 2>&1 | tee "$LOGFILE" &
 PID="$!"
 
 echo "Waiting for worker..."
