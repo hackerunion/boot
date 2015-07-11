@@ -17,11 +17,11 @@ if [ ! -x "$SYNC" ]; then
   exit 1
 fi
 
-force() {
+function force() {
   echo 1 > "$FORCE"
 }
 
-pause() {
+function pause() {
   if grep -q 0 "$PAUSE"; then
     echo 1 > "$PAUSE"
   else
@@ -29,7 +29,7 @@ pause() {
   fi
 }
 
-sync() {
+function sync() {
   pushd "$ROOT" > /dev/null
   
   if ! test -x "$SYNC"; then
@@ -46,8 +46,20 @@ sync() {
   popd > /dev/null
 }
 
+function canary() {
+  pushd $BOOT > /dev/null
+  echo "Verifying canary..."
+  make kernel-canary
+  RESULT=$?
+  popd > /dev/null
+  return $RESULT
+}
+
 function try_sync() {
-  if sync; then
+  if ! canary; then
+    echo -e "[`date`] ############ INSECURE ############"
+    return 2
+  elif sync; then
     echo -e "[`date`] ------------ SUCCESS ------------"
     return 0
   else
@@ -97,7 +109,7 @@ function wait_for_boot() {
 }
 
 function invalid() {
-  ( ! make kernel-running && make kernel-locked ) > /dev/null 2>&1
+  ( ! make kernel-running && ( make kernel-locked || ! make kernel-canary ) ) > /dev/null 2>&1
 }
 
 function state() {

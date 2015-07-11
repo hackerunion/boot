@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SERVER_ROOT="$1"
+CANARY="$SERVER_ROOT/var/run/boot/canary"
+SENTINEL="-----BEGIN PGP MESSAGE-----"
+
+if (( $# < 1 )); then
+  echo "$0: path-to-root"
+  exit 1
+fi
+
+grep -q -- "$SENTINEL" "$CANARY"
