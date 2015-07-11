@@ -42,7 +42,7 @@ echo "Launching kernel..."
 cd "$SERVER_ROOT/usr/src/kernel/"
 
 # can't run using npm since npm dies on signal
-DEBUG="$DEBUG" node ./bin/boot.js 2>&1 | tee "$LOGFILE" &
+DEBUG="$DEBUG" node ./bin/boot.js &
 PID="$!"
 
 echo "Waiting for worker..."
