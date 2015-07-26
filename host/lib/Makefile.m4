@@ -41,7 +41,7 @@ docker-run-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run --r
 kernel-development: docker-build kernel-development-no-build ; 
 kernel-development-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run -d -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT -p _THIS_SECURE_PORT:_SERVER_SECURE_PORT ifelse(_SSH_PORT, `', `', `-p '_THIS_SSH_PORT`:'_SERVER_SSH_PORT) --name _DOCKER_CONTAINER _DOCKER_IMAGE _SERVER_ROOT/boot/bin/development kernel
 
-kernel-staging: docker-build kernel-development-no-build ; 
+kernel-staging: docker-build kernel-staging-no-build ; 
 kernel-staging-no-build: ; docker rm _DOCKER_CONTAINER 2> /dev/null ; docker run -d -v _THIS_ROOT:_SERVER_ROOT -p _THIS_PORT:_SERVER_PORT -p _THIS_SECURE_PORT:_SERVER_SECURE_PORT ifelse(_SSH_PORT, `', `', `-p '_THIS_SSH_PORT`:'_SERVER_SSH_PORT) --name _DOCKER_CONTAINER _DOCKER_IMAGE _SERVER_ROOT/boot/bin/development kernel init
 
 kernel-boot: docker-build kernel-boot-no-build ; 
